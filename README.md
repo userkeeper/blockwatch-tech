@@ -41,5 +41,5 @@ Then open http://localhost:8000.
 ## Related
 
 - Product code (private): https://github.com/userkeeper/block-watch
-- Telegram bot: https://t.me/blockwatch_bot
+- Telegram bot: https://t.me/BLWDev_bot
 - Chrome extension: (Web Store URL pending)
