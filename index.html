@@ -571,48 +571,56 @@ footer {
   .foot-grid { grid-template-columns: 1fr; gap: 30px; }
   .hero { padding-bottom: 64px; }
 
-  /* ---------- Mobile centering ----------
+  /* ---------- Mobile centering (force) ----------
      On phones every section is single-column, so left-aligned heads
-     look pinned to the edge. Centre headings, eyebrows, lead copy and
-     anything that's max-width-constrained. Cards/images stay where the
-     grid puts them. */
-  .eyebrow,
-  h1, h2, h3,
-  .hero .lead,
-  .hero-micro,
-  .problem-copy p,
-  .problem-copy,
-  .wallets-cap,
-  .foot-brand p,
-  .faq-answer {
-    text-align: center;
+     look pinned to the edge. !important here defeats per-section
+     left-aligned rules (e.g. base h2, foot-brand p) without touching
+     the desktop layout. Section bodies stay as-is; only top-level
+     section heads, eyebrows and copy get centred. */
+  body section .eyebrow,
+  body section > .wrap > .reveal > h2,
+  body section > .wrap > .reveal > p,
+  body section h1,
+  body section h2,
+  body section h3,
+  body .hero .lead,
+  body .hero-micro,
+  body .problem-copy,
+  body .problem-copy p,
+  body .wallets-cap,
+  body footer .foot-brand,
+  body footer .foot-brand p,
+  body footer .foot-brand .copy,
+  body footer .foot-col,
+  body footer .foot-col h4,
+  body footer .foot-col a {
+    text-align: center !important;
   }
-  /* Constrained-width text needs auto margins too, not just text-align. */
-  h1, h2, h3,
-  .hero .lead,
-  .hero-micro,
-  .problem-copy,
-  .wallets-cap,
-  .foot-brand p {
-    margin-left: auto;
-    margin-right: auto;
+  /* Constrained-width text gets auto side-margins so it actually sits
+     in the middle instead of left-aligned at max-width. */
+  body section h1,
+  body section h2,
+  body section h3,
+  body .hero .lead,
+  body .hero-micro,
+  body .problem-copy,
+  body .wallets-cap,
+  body footer .foot-brand p {
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
-  /* Sections that were left-aligned grids — centre their content. */
-  .problem-copy { max-width: 560px; }
-  .faq-list { margin-left: auto; margin-right: auto; }
-  .faq-q, .faq-answer { text-align: left; }   /* FAQ rows keep left-align inside */
-  /* Hero CTA stays single column already; centre it just in case. */
-  .hero .cta-row,
-  .pay-row,
-  .pay-row-compact { justify-content: center; align-items: center; }
-  /* Footer columns stack — centre the brand block + nav so they don't pin
-     to the left when the grid collapses. */
-  .foot-brand,
-  .foot-col { text-align: center; }
-  .foot-col ul { padding-left: 0; }
-  .foot-col li { list-style: none; }
-  /* Topbar: keep logo left, lang toggle right (don't centre these). */
-  .topbar .wrap { /* leave default */ }
+  body .problem-copy { max-width: 560px; }
+  /* Flex rows centre their children when stacked. */
+  body .pay-row,
+  body .pay-row-compact,
+  body .cta-row { justify-content: center !important; align-items: center !important; }
+  /* Footer columns stack at <768px; centre their content + remove the
+     UL bullet indent so links line up properly under the heading. */
+  body footer .foot-col ul {
+    padding-left: 0 !important;
+    align-items: center !important;
+  }
+  body footer .foot-col li { list-style: none !important; }
 }
 </style>
 </head>
