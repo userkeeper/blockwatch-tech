@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<!--
+  index.html — Block Watch Shield landing page (blockwatch.tech)
+  Block Watch Shield is a Chrome extension that reviews every dApp signature
+  request with AI before your wallet signs it: calldata decode, phishing DB,
+  OFAC sanctions, and dangerous-pattern detection. Single-purpose landing.
+  Last updated 2026-05-29.
+-->
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title data-i18n="ptitle">Block Watch Shield — Читайте каждую транзакцию до подписи кошелька</title>
+<meta name="description" content="Block Watch Shield проверяет каждую подпись в dApp с помощью ИИ, прежде чем MetaMask, Phantom или Tonkeeper её подпишут. Бесплатное расширение для Chrome." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ===================================================================
+   tokens.css — Block Watch design tokens (embedded verbatim)
+   =================================================================== */
+:root {
+  /* ---------- Surfaces ---------- */
+  --bg:            #0a0e1a;   /* page background */
+  --bg-deep:       #06090f;   /* deeper background, for inset surfaces */
+  --surface:       #141a2a;   /* card / input background */
+  --surface-hover: #232b4a;   /* card hover */
+  --border:        rgba(96, 165, 250, 0.12);
+  --border-strong: rgba(96, 165, 250, 0.25);
+
+  /* ---------- Text ---------- */
+  --text:        #f1f5fb;     /* primary text */
+  --text-muted:  #8ca0c0;     /* secondary text */
+  --text-dim:    #5a6a85;     /* placeholder, disabled */
+
+  /* ---------- Accent (brand blue) ---------- */
+  --accent:          #4d9fff;
+  --accent-strong:   #1d7af5;
+  --accent-soft:     rgba(77, 159, 255, 0.15);
+  --accent-text:     #ffffff;
+  --accent-gradient: linear-gradient(135deg, #4d9fff 0%, #1d7af5 100%);
+
+  /* ---------- Status ---------- */
+  --danger:       #ff5c5c;
+  --danger-soft:  rgba(255, 92, 92, 0.12);
+  --success:      #22c98a;
+  --success-soft: rgba(34, 201, 138, 0.12);
+  --warning:      #ffb547;
+
+  /* ---------- Geometry ---------- */
+  --radius-sm: 8px;
+  --radius:    14px;
+  --radius-lg: 20px;
+  --space:     16px;
+
+  /* ---------- Shadows ---------- */
+  --shadow-sm:   0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md:   0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 24px rgba(77, 159, 255, 0.18);
+}
+
+/* Page background: pure dark + two subtle radial glows on top. */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 50% -10%, rgba(77, 159, 255, 0.18), transparent 55%),
+    radial-gradient(circle at 90% 0%,   rgba(29, 122, 245, 0.08), transparent 40%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Buttons (primary) ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent-gradient);
+  color: var(--accent-text);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(29, 122, 245, 0.35);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.btn:hover  { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(29, 122, 245, 0.45); }
+.btn:active { transform: translateY(0);    box-shadow: 0 2px 8px rgba(29, 122, 245, 0.35); }
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  box-shadow: none;
+}
+.btn-secondary:hover { background: var(--surface-hover); }
+
+/* ---------- Cards (glass surface) ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Section heading gradient (page-title style) ---------- */
+.heading-gradient {
+  background: linear-gradient(135deg, #f1f5fb 0%, #a4c3ec 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+}
+
+/* ===================================================================
+   Page styles
+   =================================================================== */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+
+img { display: block; max-width: 100%; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #79b6ff; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: 28px;
+}
+
+section { position: relative; }
+
+/* generic section heading */
+.eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 14px;
+}
+h2 {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+.lead {
+  color: var(--text-muted);
+  font-size: clamp(16px, 1.6vw, 19px);
+  line-height: 1.6;
+  max-width: 60ch;
+}
+
+/* ---------------- Top bar ---------------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  padding-block: 22px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.brand img { width: 38px; height: 38px; filter: drop-shadow(0 2px 10px rgba(77,159,255,0.35)); }
+.brand .sub { color: var(--accent); font-weight: 600; }
+
+/* ---------------- Hero ---------------- */
+.hero {
+  text-align: center;
+  padding-top: 46px;
+  padding-bottom: 92px;
+}
+.hero-emblem {
+  width: 124px;
+  height: 124px;
+  margin: 0 auto 30px;
+  filter: drop-shadow(0 10px 40px rgba(77, 159, 255, 0.35));
+  animation: floaty 6s ease-in-out infinite;
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+.hero h1 {
+  font-size: clamp(38px, 6.4vw, 76px);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  margin: 0 auto 22px;
+  padding-bottom: 0.12em;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+.hero .lead {
+  margin: 0 auto 36px;
+  max-width: 58ch;
+  font-size: clamp(16px, 1.8vw, 20px);
+}
+.hero .btn { padding: 16px 30px; font-size: 17px; border-radius: var(--radius); }
+.hero-micro {
+  margin-top: 22px;
+  color: var(--text-dim);
+  font-size: 14px;
+  max-width: 52ch;
+  margin-inline: auto;
+}
+
+/* ---------------- Problem + before/after ---------------- */
+.problem { padding-block: 40px 96px; }
+.problem-copy { max-width: 760px; }
+.problem-copy p { color: var(--text-muted); font-size: clamp(16px,1.6vw,19px); line-height: 1.65; }
+.problem-copy p strong { color: var(--text); font-weight: 600; }
+
+.compare {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 22px;
+  align-items: center;
+}
+.mock {
+  background: var(--bg-deep);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+}
+.mock-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 14px;
+}
+.mock-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.mock-dot { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-hover); flex: none; border: 1px solid var(--border-strong); }
+.mock-dot.glass { background: radial-gradient(circle at 35% 30%, #5a6d96, #1b2235); }
+.mock-head .t { font-weight: 600; font-size: 14px; }
+.mock-head .s { font-size: 12px; color: var(--text-dim); }
+.mock-field-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
+.hexblock {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #6b7da0;
+  word-break: break-all;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  max-height: 132px;
+  overflow: hidden;
+  position: relative;
+}
+.hexblock::after {
+  content: "";
+  position: absolute; inset: auto 0 0 0; height: 46px;
+  background: linear-gradient(transparent, var(--bg-deep));
+}
+.mock-actions { display: flex; gap: 10px; margin-top: 16px; }
+.mock-btn {
+  flex: 1; text-align: center; padding: 11px; border-radius: var(--radius-sm);
+  font-weight: 600; font-size: 14px; border: 1px solid var(--border-strong);
+  color: var(--text-muted); background: transparent;
+}
+.mock-btn.primary { background: var(--surface-hover); color: var(--text); border-color: transparent; }
+.mock-btn.danger { background: var(--danger-soft); color: var(--danger); border-color: rgba(255,92,92,0.35); }
+.mock-btn.ghost { color: var(--text-dim); }
+
+.verdict-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--danger-soft); color: var(--danger);
+  border: 1px solid rgba(255,92,92,0.35);
+  padding: 7px 13px; border-radius: 999px; font-weight: 700; font-size: 13px;
+  letter-spacing: 0.02em; margin-bottom: 14px;
+}
+.verdict-summary { font-size: 15px; font-weight: 600; line-height: 1.45; margin: 0 0 14px; }
+.verdict-summary em { color: var(--danger); font-style: normal; }
+.reasons { list-style: none; margin: 0 0 4px; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.reasons li { display: flex; gap: 9px; font-size: 13.5px; color: var(--text-muted); line-height: 1.4; }
+.reasons li::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: 7px; border-radius: 50%; background: var(--danger); }
+
+.compare-arrow {
+  display: grid; place-items: center;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent);
+  font-size: 22px; font-weight: 700;
+}
+
+/* ---------------- How it works ---------------- */
+.section-pad { padding-block: 56px; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 44px; }
+.step {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  box-shadow: var(--shadow-md);
+  display: flex; flex-direction: column;
+}
+.step-num {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 17px; color: var(--accent-text);
+  background: var(--accent-gradient);
+  box-shadow: 0 4px 14px rgba(29,122,245,0.35);
+  margin-bottom: 18px;
+}
+.step h3 { margin: 0 0 8px; font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
+.step p { margin: 0; color: var(--text-muted); font-size: 15px; line-height: 1.55; }
+.step-thumb {
+  margin-top: 18px; border-radius: var(--radius);
+  border: 1px solid var(--border-strong); background: var(--bg-deep);
+  padding: 12px;
+}
+.step-thumb img { border-radius: 8px; }
+
+/* ---------------- What Shield checks ---------------- */
+.checks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 44px; }
+.check {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+.check:hover { border-color: var(--border-strong); background: var(--surface-hover); transform: translateY(-2px); }
+.check-ico {
+  width: 44px; height: 44px; border-radius: 12px; margin-bottom: 16px;
+  display: grid; place-items: center;
+  background: var(--accent-soft); border: 1px solid var(--border-strong);
+}
+.check-ico svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.check h3 { margin: 0 0 8px; font-size: 18px; font-weight: 700; letter-spacing: 0.01em; text-transform: uppercase; }
+.check p { margin: 0; color: var(--text-muted); font-size: 14.5px; line-height: 1.55; }
+
+/* ---------------- Compatible wallets ---------------- */
+.wallets { text-align: center; padding-block: 64px; }
+.wallets h2 { margin-inline: auto; max-width: 22ch; }
+.wallets-img { max-width: 420px; margin: 18px auto 24px; filter: drop-shadow(0 16px 50px rgba(0,0,0,0.5)); }
+.wallets-cap { color: var(--text-muted); font-size: 15px; max-width: 70ch; margin: 0 auto; line-height: 1.6; }
+
+/* ---------------- Premium ---------------- */
+.premium-card {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: clamp(28px, 4vw, 48px);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  margin-top: 40px;
+}
+.tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.tier { background: var(--bg-deep); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+.tier.pro { border-color: var(--border-strong); background: linear-gradient(180deg, rgba(77,159,255,0.06), var(--bg-deep)); }
+.tier-name { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 16px; color: var(--text-dim); }
+.tier.pro .tier-name { color: var(--accent); }
+.tier ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.tier li { display: flex; gap: 11px; font-size: 14.5px; line-height: 1.45; color: var(--text-muted); }
+.tier li::before {
+  content: ""; flex: none; width: 18px; height: 18px; margin-top: 1px; border-radius: 50%;
+  background: var(--accent-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234d9fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") center / 12px no-repeat;
+}
+.tier.pro li { color: var(--text); }
+.pay-row { display: flex; gap: 16px; margin-top: 26px; }
+.pay-row a { flex: 1; border-radius: var(--radius); overflow: hidden; transition: transform 120ms ease, box-shadow 120ms ease; box-shadow: var(--shadow-md); }
+.pay-row a:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.45); }
+.pay-row img { width: 100%; }
+.pay-row-compact { justify-content: center; flex-wrap: wrap; margin-top: 0; max-width: 460px; margin-inline: auto; }
+.pay-row-compact a { flex: 0 1 195px; }
+
+/* ---------------- FAQ ---------------- */
+.faq { padding-block: 64px; }
+.faq-list { margin-top: 36px; max-width: 860px; }
+details {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+details[open] { border-color: var(--border-strong); }
+summary {
+  list-style: none; cursor: pointer;
+  padding: 20px 22px; font-weight: 600; font-size: 17px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+summary::-webkit-details-marker { display: none; }
+summary .chev { flex: none; width: 22px; height: 22px; position: relative; transition: transform 200ms ease; color: var(--accent); }
+summary .chev::before, summary .chev::after {
+  content: ""; position: absolute; top: 10px; width: 11px; height: 2px; border-radius: 2px; background: currentColor;
+}
+summary .chev::before { left: 1px; transform: rotate(45deg); }
+summary .chev::after  { right: 1px; transform: rotate(-45deg); }
+details[open] summary .chev { transform: rotate(180deg); }
+.faq-answer { padding: 0 22px 22px; color: var(--text-muted); font-size: 15px; line-height: 1.65; max-width: 75ch; }
+.faq-answer code { font-family: ui-monospace, Menlo, monospace; font-size: 13px; color: var(--accent); background: var(--accent-soft); padding: 1px 6px; border-radius: 5px; }
+
+/* ---------------- Final CTA ---------------- */
+.final {
+  text-align: center;
+  padding-block: 100px;
+}
+.final h2 { margin-inline: auto; }
+.final .btn { padding: 16px 30px; font-size: 17px; margin-top: 8px; }
+.final-micro { margin-top: 20px; color: var(--text-dim); font-size: 14px; }
+
+/* ---------------- Footer ---------------- */
+footer {
+  border-top: 1px solid var(--border);
+  background: var(--bg-deep);
+  padding-block: 52px;
+}
+.foot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 36px; }
+.foot-brand .brand { margin-bottom: 14px; }
+.foot-brand p { color: var(--text-muted); font-size: 14.5px; margin: 0 0 6px; max-width: 30ch; }
+.foot-brand .copy { color: var(--text-dim); font-size: 13px; }
+.foot-col h4 { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin: 0 0 16px; font-weight: 700; }
+.foot-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+.foot-col a { color: var(--text-muted); font-size: 14.5px; }
+.foot-col a:hover { color: var(--text); }
+
+/* ---------------- Scroll reveal ---------------- */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 600ms ease, transform 600ms ease; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .hero-emblem { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ---------------- Image elements (liquid-glass renders) ---------------- */
+.cta-install { display: inline-block; line-height: 0; transition: transform 130ms ease, filter 130ms ease; border-radius: 999px; }
+.cta-install img { width: min(440px, 84vw); height: auto; filter: drop-shadow(0 12px 30px rgba(29,122,245,0.22)); }
+.cta-install:hover { transform: translateY(-2px); }
+.cta-install:hover img { filter: drop-shadow(0 16px 38px rgba(29,122,245,0.4)); }
+.cta-install:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+
+.step-img { width: 100%; height: auto; display: block; filter: drop-shadow(0 16px 36px rgba(0,0,0,0.45)); transition: transform 200ms ease; }
+.step-img:hover { transform: translateY(-4px); }
+
+.checks-stack { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; margin-top: 44px; max-width: 1040px; margin-inline: auto; align-items: start; }
+.check-img { width: 100%; height: auto; display: block; filter: drop-shadow(0 16px 40px rgba(0,0,0,0.45)); transition: transform 200ms ease; }
+.check-img:hover { transform: translateY(-3px); }
+
+/* ---------------- Support / donate ---------------- */
+.support { text-align: center; }
+.support .eyebrow, .support h2 { text-align: center; }
+.support h2 { margin-inline: auto; }
+.support-sub { margin: 0 auto 8px; }
+.donate-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(16px, 3.5vw, 40px); max-width: 760px; margin: 44px auto 0; }
+.donate-orb { position: relative; border: none; background: none; padding: 0; cursor: pointer; line-height: 0; border-radius: 28px; transition: transform 160ms ease; }
+.donate-orb img { width: clamp(84px, 12vw, 120px); height: auto; filter: drop-shadow(0 10px 26px rgba(0,0,0,0.5)); transition: filter 160ms ease; }
+.donate-orb:hover { transform: translateY(-5px); }
+.donate-orb:hover img { filter: drop-shadow(0 16px 34px rgba(77,159,255,0.32)); }
+.donate-orb:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.donate-toast {
+  position: absolute; left: 50%; top: -16px; transform: translate(-50%, 6px);
+  background: var(--success-soft); color: var(--success); border: 1px solid rgba(34,201,138,0.4);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.02em; line-height: 1.2;
+  padding: 5px 11px; border-radius: 999px; white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity 160ms ease, transform 160ms ease;
+}
+.donate-orb.copied .donate-toast { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------------- Language toggle ---------------- */
+.topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.lang-toggle {
+  display: inline-flex; gap: 4px; flex: none; position: relative;
+  border-radius: 999px; padding: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: linear-gradient(180deg, rgba(28,34,48,0.55), rgba(6,9,15,0.55));
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.14),
+    inset 0 -4px 9px rgba(0,0,0,0.6),
+    0 6px 18px rgba(0,0,0,0.45);
+}
+.lang-btn {
+  position: relative; border: none; background: transparent; color: var(--text-dim);
+  font: inherit; font-weight: 600; font-size: 13px; letter-spacing: 0.03em;
+  padding: 6px 16px; border-radius: 999px; cursor: pointer;
+  transition: color 140ms ease;
+}
+.lang-btn.on {
+  color: var(--text);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.03) 45%, rgba(255,255,255,0) 70%),
+    linear-gradient(180deg, rgba(40,48,66,0.9), rgba(12,16,26,0.95));
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.45),
+    inset 0 -4px 8px rgba(0,0,0,0.55),
+    0 3px 9px rgba(0,0,0,0.5);
+}
+.lang-btn:not(.on):hover { color: var(--text-muted); }
+.lang-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 900px) {
+  .checks { grid-template-columns: 1fr 1fr; }
+  .donate-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .wrap { padding-inline: 20px; }
+  .compare { grid-template-columns: 1fr; gap: 16px; }
+  .compare-arrow { transform: rotate(90deg); margin: 0 auto; }
+  .steps { grid-template-columns: 1fr; }
+  .checks { grid-template-columns: 1fr; }
+  .checks-stack { grid-template-columns: 1fr; }
+  .tiers { grid-template-columns: 1fr; }
+  .pay-row { flex-direction: column; }
+  .foot-grid { grid-template-columns: 1fr; gap: 30px; }
+  .hero { padding-bottom: 64px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar" data-screen-label="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Block Watch — на главную">
+      <img src="./logo.png" alt="Эмблема Block Watch" />
+      <span>Block Watch <span class="sub">Shield</span></span>
+    </a>
+    <div class="lang-toggle" role="group" aria-label="Language / Язык">
+      <button class="lang-btn" data-lang="ru" type="button">RU</button>
+      <button class="lang-btn" data-lang="en" type="button">EN</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ 1. HERO ============ -->
+  <section class="hero" data-screen-label="hero">
+    <div class="wrap">
+      <img class="hero-emblem" src="./nav-shield.png" alt="Эмблема Block Watch Shield" />
+      <h1 class="heading-gradient" data-i18n="hero_h1" style="width: 800px; margin: 2px 132px 22px">Читайте каждую транзакцию до того, как кошелёк её подпишет.</h1>
+      <p class="lead" data-i18n="hero_lead">Block Watch Shield проверяет каждую подпись в dApp с помощью ИИ, прежде чем MetaMask, Phantom или Tonkeeper её подпишут. Бесплатно.</p>
+      <a class="cta-install" href="https://chrome.google.com/webstore/..." target="_blank" rel="noopener"><img data-i18n-img="install" src="./img/el-install-ru.png" alt="Установить для Chrome" /></a>
+      <p class="hero-micro" data-i18n="hero_micro">Работает с MetaMask, Rabby, Coinbase Wallet, Phantom, Tonkeeper. Приватные ключи не покидают браузер.</p>
+    </div>
+  </section>
+
+  <!-- ============ 2. THE PROBLEM ============ -->
+  <section class="problem" data-screen-label="problem">
+    <div class="wrap">
+      <div class="problem-copy reveal">
+        <p class="eyebrow" data-i18n="prob_eyebrow">Риск</p>
+        <h2 class="heading-gradient" data-i18n="prob_h2">Одна плохая подпись может слить всё.</h2>
+        <p data-i18n="prob_p1">Один <strong>approve(unlimited)</strong> или <strong>setApprovalForAll</strong> позволяет контракту вывести все токены из вашего кошелька. Подпись <strong>Permit2</strong> делает это вообще без транзакции в блокчейне. Большинство кошельков показывают стену из hex и спрашивают &laquo;Подтвердить?&raquo;</p>
+        <p data-i18n="prob_p2"><strong>Shield читает этот hex за вас.</strong></p>
+      </div>
+
+      <div class="compare reveal">
+        <!-- BEFORE: generic wallet popup with raw hex -->
+        <div class="mock">
+          <p class="mock-label" data-i18n="m_before_label">Без Shield</p>
+          <div class="mock-head">
+            <span class="mock-dot"></span>
+            <div>
+              <div class="t" data-i18n="m_yourwallet">Ваш кошелёк</div>
+              <div class="s" data-i18n="m_sigrequest">Запрос подписи</div>
+            </div>
+          </div>
+          <p class="mock-field-label" data-i18n="m_msgdata">Данные сообщения</p>
+          <div class="hexblock">0x095ea7b3000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff</div>
+          <div class="mock-actions">
+            <button class="mock-btn ghost" type="button" tabindex="-1" data-i18n="m_reject">Отклонить</button>
+            <button class="mock-btn primary" type="button" tabindex="-1" data-i18n="m_confirm">Подтвердить</button>
+          </div>
+        </div>
+
+        <div class="compare-arrow" aria-hidden="true">&rarr;</div>
+
+        <!-- AFTER: Shield verdict card -->
+        <div class="mock">
+          <p class="mock-label" data-i18n="m_after_label">С Block Watch Shield</p>
+          <div class="mock-head">
+            <span class="mock-dot glass"></span>
+            <div>
+              <div class="t" data-i18n="m_verdict">Вердикт Shield</div>
+              <div class="s" data-i18n="m_unlimited">Неограниченный доступ к токенам</div>
+            </div>
+          </div>
+          <span class="verdict-badge" data-i18n="m_badge">&#9888; Высокий риск</span>
+          <p class="verdict-summary" data-i18n="m_summary">Этому контракту будет разрешено тратить <em>ВСЕ ваши USDC</em> — сейчас и в будущем.</p>
+          <ul class="reasons">
+            <li data-i18n="m_r1">Сумма разрешения не ограничена (2&#8203;^256&#8202;&minus;&#8202;1)</li>
+            <li data-i18n="m_r2">Контракт-получатель не верифицирован, ему 3 дня</li>
+            <li data-i18n="m_r3">Запрашивающий домен отсутствует в каталоге известных dApp</li>
+          </ul>
+          <div class="mock-actions">
+            <button class="mock-btn danger" type="button" tabindex="-1" data-i18n="m_reject">Отклонить</button>
+            <button class="mock-btn ghost" type="button" tabindex="-1" data-i18n="m_approve">Всё равно одобрить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. HOW IT WORKS ============ -->
+  <section class="section-pad" data-screen-label="how-it-works">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow" data-i18n="how_eyebrow">Как это работает</p>
+        <h2 class="heading-gradient" data-i18n="how_h2">Запуск меньше чем за минуту.</h2>
+      </div>
+      <div class="steps">
+        <img class="step-img reveal" data-i18n-img="step1" src="./img/el-step1-ru.png" alt="Шаг 1 — Установка: добавьте Block Watch Shield в Chrome" />
+        <img class="step-img reveal" data-i18n-img="step2" src="./img/el-step2-ru.png" alt="Шаг 2 — Привязка: введите 6-значный код из Mini App" />
+        <img class="step-img reveal" data-i18n-img="step3" src="./img/el-step3-ru.png" alt="Шаг 3 — Используйте: Shield показывает, что подпишет кошелёк" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. WHAT SHIELD CHECKS ============ -->
+  <section class="section-pad" data-screen-label="what-shield-checks">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow" data-i18n="chk_eyebrow">Под капотом</p>
+        <h2 class="heading-gradient" data-i18n="chk_h2">Четыре проверки на каждый запрос.</h2>
+      </div>
+      <div class="checks-stack">
+        <img class="check-img reveal" data-i18n-img="check_phish" src="./img/el-check-phish-ru.png" alt="Фишинговые домены — проверка по базе MetaMask eth-phishing-detect" style="width: 480px; height: 220px" />
+
+        <img class="check-img reveal" data-i18n-img="check_sanctioned" src="./img/el-check-sanctioned-ru.png" alt="Адреса под санкциями — список OFAC SDN синхронизируется ежедневно" style="width: 480px; height: 220px" />
+
+        <img class="check-img reveal" data-i18n-img="check_calldata" src="./img/el-check-calldata-ru.png" alt="Декодирование calldata — approve, setApprovalForAll, Permit, Permit2, EIP-712" style="width: 480px; height: 220px" />
+        <img class="check-img reveal" data-i18n-img="check_domain" src="./img/el-check-domain-ru.png" alt="Репутация домена — сверка с каталогом известных dApp" style="width: 480px; height: 220px" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. COMPATIBLE WALLETS ============ -->
+  <section class="wallets" data-screen-label="compatible-wallets">
+    <div class="wrap reveal">
+      <p class="eyebrow" data-i18n="wal_eyebrow">Совместимость</p>
+      <h2 class="heading-gradient" data-i18n="wal_h2">Работает с кошельками, которыми вы уже пользуетесь.</h2>
+      <img class="wallets-img" src="./compatible-wallets.png" alt="Поддерживаемые кошельки: MetaMask, Phantom, Tonkeeper и другие в виде стеклянных эмблем" />
+      <p class="wallets-cap" data-i18n="wal_cap">Любой кошелёк EIP-1193 в Ethereum, Polygon, BSC, Arbitrum, Optimism, Base &middot; Phantom в Solana &middot; Tonkeeper в TON &middot; кошельки NEAR.</p>
+    </div>
+  </section>
+
+  <!-- ============ 6. PREMIUM ============ -->
+  <section class="section-pad" data-screen-label="premium">
+    <div class="wrap">
+      <div class="pay-row pay-row-compact reveal">
+        <a href="https://t.me/BLWDev_bot/app?startapp=premium" target="_blank" rel="noopener" aria-label="Оплатить Premium через Telegram Stars">
+          <img src="./pay-stars.png" alt="Оплата через Telegram Stars" />
+        </a>
+        <a href="https://t.me/BLWDev_bot/app?startapp=premium" target="_blank" rel="noopener" aria-label="Оплатить Premium через TON">
+          <img src="./pay-ton.png" alt="Оплата через TON" />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SUPPORT / DONATE ============ -->
+  <section class="support section-pad" data-screen-label="support">
+    <div class="wrap reveal">
+      <p class="eyebrow" data-i18n="sup_eyebrow">Донат</p>
+      <h2 class="heading-gradient" data-i18n="sup_h2">Поддержать проект</h2>
+      <p class="lead support-sub" data-i18n="sup_sub">Нажмите — адрес скопируется.</p>
+      <div class="donate-grid">
+        <button class="donate-orb" type="button" data-address="bc1qly65zeqwuu9jppevgn50pev4588h8kpf2ltx6d" title="bc1qly65zeqwuu9jppevgn50pev4588h8kpf2ltx6d" aria-label="Bitcoin — скопировать адрес">
+          <img src="./donate-btc.png" alt="Bitcoin" />
+          <span class="donate-toast" data-i18n="sup_copy_done" aria-hidden="true">Скопировано ✓</span>
+        </button>
+        <button class="donate-orb" type="button" data-address="0xc7345AA7E3aaC0F5bB11B3Add06647E717BD5730" title="0xc7345AA7E3aaC0F5bB11B3Add06647E717BD5730" aria-label="Ethereum — скопировать адрес">
+          <img src="./donate-eth.png" alt="Ethereum" />
+          <span class="donate-toast" data-i18n="sup_copy_done" aria-hidden="true">Скопировано ✓</span>
+        </button>
+        <button class="donate-orb" type="button" data-address="TREv4WVifxdqMgmpJbrvJBBf8Q8h3vFbsa" title="TREv4WVifxdqMgmpJbrvJBBf8Q8h3vFbsa" aria-label="Tether USDT TRC-20 — скопировать адрес">
+          <img src="./donate-usdt.png" alt="Tether USDT" />
+          <span class="donate-toast" data-i18n="sup_copy_done" aria-hidden="true">Скопировано ✓</span>
+        </button>
+        <button class="donate-orb" type="button" data-address="UQDrQAmZBtfPeC7Vjqkrb7SMdmxJ2py02MOCzLIQJjdjrZ2O" title="UQDrQAmZBtfPeC7Vjqkrb7SMdmxJ2py02MOCzLIQJjdjrZ2O" aria-label="Toncoin — скопировать адрес">
+          <img src="./donate-ton.png" alt="Toncoin" />
+          <span class="donate-toast" data-i18n="sup_copy_done" aria-hidden="true">Скопировано ✓</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+  <!-- ============ FOOTER ============ -->
+<footer data-screen-label="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top" aria-label="Block Watch — на главную">
+          <img src="./logo.png" alt="Эмблема Block Watch" />
+          <span>Block Watch <span class="sub">Shield</span></span>
+        </a>
+        <p data-i18n="foot_tag">Web3-безопасность для каждого.</p>
+        <p class="copy">&copy; 2026 Block Watch</p>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="foot_product">Продукт</h4>
+        <ul>
+          <li><a href="https://chrome.google.com/webstore/..." target="_blank" rel="noopener" data-i18n="foot_ext">Расширение Chrome</a></li>
+          <li><a href="https://t.me/BLWDev_bot/app" target="_blank" rel="noopener" data-i18n="foot_miniapp">Открыть Mini App</a></li>
+          <li><a href="#" data-i18n="foot_privacy">Конфиденциальность</a></li>
+          <li><a href="#" data-i18n="foot_terms">Условия</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4 data-i18n="foot_contact">Контакты</h4>
+        <ul>
+          <li><a href="mailto:support@blockwatch.tech">support@blockwatch.tech</a></li>
+          <li><a href="https://t.me/BLWDev_bot" target="_blank" rel="noopener">t.me/BLWDev_bot</a></li>
+          <li><a href="https://t.me/BWDevapp" target="_blank" rel="noopener" data-i18n="foot_channel">Канал в Telegram</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Scroll-reveal — progressive enhancement only. */
+(function () {
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  els.forEach(function (el) { io.observe(el); });
+})();
+
+/* Language switch (RU / EN) — persisted in localStorage. */
+(function () {
+  var I18N = {
+    ptitle:        { ru: "Block Watch Shield — Читайте каждую транзакцию до подписи кошелька", en: "Block Watch Shield — Read every transaction before your wallet signs" },
+    hero_h1:       { ru: "Читайте каждую транзакцию до того, как кошелёк её подпишет.", en: "Read every transaction before your wallet signs." },
+    hero_lead:     { ru: "Block Watch Shield проверяет каждую подпись в dApp с помощью ИИ, прежде чем MetaMask, Phantom или Tonkeeper её подпишут. Бесплатно.", en: "Block Watch Shield reviews every dApp signature with AI before MetaMask, Phantom, or Tonkeeper can sign it. Free." },
+    cta_install:   { ru: "Установить для Chrome", en: "Install for Chrome" },
+    hero_micro:    { ru: "Работает с MetaMask, Rabby, Coinbase Wallet, Phantom, Tonkeeper. Приватные ключи не покидают браузер.", en: "Works with MetaMask, Rabby, Coinbase Wallet, Phantom, Tonkeeper. No private keys leave your browser." },
+
+    prob_eyebrow:  { ru: "Риск", en: "The risk" },
+    prob_h2:       { ru: "Одна плохая подпись может слить всё.", en: "One bad signature can drain everything." },
+    prob_p1:       { ru: "Один <strong>approve(unlimited)</strong> или <strong>setApprovalForAll</strong> позволяет контракту вывести все токены из вашего кошелька. Подпись <strong>Permit2</strong> делает это вообще без транзакции в блокчейне. Большинство кошельков показывают стену из hex и спрашивают &laquo;Подтвердить?&raquo;", en: "A single <strong>approve(unlimited)</strong> or <strong>setApprovalForAll</strong> lets a contract move every token in your wallet. A <strong>Permit2</strong> signature lets it happen with no on-chain transaction at all. Most wallets show you a wall of hex and ask &ldquo;Confirm?&rdquo;" },
+    prob_p2:       { ru: "<strong>Shield читает этот hex за вас.</strong>", en: "<strong>Shield reads that hex for you.</strong>" },
+
+    m_before_label:{ ru: "Без Shield", en: "Without Shield" },
+    m_yourwallet:  { ru: "Ваш кошелёк", en: "Your wallet" },
+    m_sigrequest:  { ru: "Запрос подписи", en: "Signature request" },
+    m_msgdata:     { ru: "Данные сообщения", en: "Message data" },
+    m_reject:      { ru: "Отклонить", en: "Reject" },
+    m_confirm:     { ru: "Подтвердить", en: "Confirm" },
+    m_after_label: { ru: "С Block Watch Shield", en: "With Block Watch Shield" },
+    m_verdict:     { ru: "Вердикт Shield", en: "Shield verdict" },
+    m_unlimited:   { ru: "Неограниченный доступ к токенам", en: "Unlimited token approval" },
+    m_badge:       { ru: "&#9888; Высокий риск", en: "&#9888; High risk" },
+    m_summary:     { ru: "Этому контракту будет разрешено тратить <em>ВСЕ ваши USDC</em> — сейчас и в будущем.", en: "This contract will be allowed to spend <em>ALL your USDC</em>, now and in the future." },
+    m_r1:          { ru: "Сумма разрешения не ограничена (2&#8203;^256&#8202;&minus;&#8202;1)", en: "Approval amount is unlimited (2&#8203;^256&#8202;&minus;&#8202;1)" },
+    m_r2:          { ru: "Контракт-получатель не верифицирован, ему 3 дня", en: "Spender contract is unverified and 3 days old" },
+    m_r3:          { ru: "Запрашивающий домен отсутствует в каталоге известных dApp", en: "Requesting domain not in known-dApps catalog" },
+    m_approve:     { ru: "Всё равно одобрить", en: "Approve anyway" },
+
+    how_eyebrow:   { ru: "Как это работает", en: "How it works" },
+    how_h2:        { ru: "Запуск меньше чем за минуту.", en: "Up and running in under a minute." },
+    step1_t:       { ru: "Установка", en: "Install" },
+    step1_p:       { ru: "Добавьте Block Watch Shield в Chrome. Два клика &mdash; для старта аккаунт не нужен.", en: "Add Block Watch Shield to Chrome. Two clicks &mdash; no account required to start." },
+    step2_t:       { ru: "Привязка", en: "Pair" },
+    step2_p:       { ru: "Откройте Mini App в Telegram и введите 6-значный код в окно расширения. Пять секунд, один раз.", en: "Open the Mini App in Telegram, type the 6-char code into the extension popup. Five seconds, once." },
+    step3_t:       { ru: "Используйте", en: "Browse" },
+    step3_p:       { ru: "Пользуйтесь dApp как обычно. Когда что-то запрашивает подпись, Shield покажет, что произойдёт, до того как кошелёк подпишет.", en: "Use dApps normally. When something asks for a signature, Shield shows you what it does before your wallet signs." },
+
+    chk_eyebrow:   { ru: "Под капотом", en: "Under the hood" },
+    chk_h2:        { ru: "Четыре проверки на каждый запрос.", en: "Four checks on every request." },
+    chk1_t:        { ru: "Фишинговые домены", en: "Phishing domains" },
+    chk1_p:        { ru: "База MetaMask eth-phishing-detect в реальном времени, обновляется ежечасно. ~10 000 известных скам-сайтов блокируются прямо в окне.", en: "Real-time MetaMask eth-phishing-detect database, refreshed hourly. ~10,000 known scam sites blocked at the popup." },
+    chk2_t:        { ru: "Адреса под санкциями", en: "Sanctioned addresses" },
+    chk2_p:        { ru: "Список OFAC SDN синхронизируется ежедневно. Перевод на санкционный адрес помечается красным до подписи.", en: "OFAC SDN list synced daily. Sending to a sanctioned address gets flagged red before you sign." },
+    chk3_t:        { ru: "Декодирование calldata", en: "Calldata decoding" },
+    chk3_p:        { ru: "Каждая EVM-транзакция декодируется. approve / setApprovalForAll / Permit / Permit2 / типизированные данные EIP-712 помечаются с реальной суммой и контрагентом.", en: "Every EVM transaction decoded. approve / setApprovalForAll / Permit / Permit2 / EIP-712 typed data flagged with the actual amount and counterparty." },
+    chk4_t:        { ru: "Репутация домена", en: "Domain reputation" },
+    chk4_p:        { ru: "Сверка с каталогом известных dApp и возрастом регистрации. Новый домен, выдающий себя за Uniswap? Пойман.", en: "Cross-checked against a known-dApps catalog and registrar age. New domain claiming to be Uniswap? Caught." },
+
+    wal_eyebrow:   { ru: "Совместимость", en: "Compatibility" },
+    wal_h2:        { ru: "Работает с кошельками, которыми вы уже пользуетесь.", en: "Works with the wallets you already use." },
+    wal_cap:       { ru: "Любой кошелёк EIP-1193 в Ethereum, Polygon, BSC, Arbitrum, Optimism, Base &middot; Phantom в Solana &middot; Tonkeeper в TON &middot; кошельки NEAR.", en: "Any EIP-1193 wallet on Ethereum, Polygon, BSC, Arbitrum, Optimism, Base &middot; Phantom on Solana &middot; Tonkeeper on TON &middot; NEAR wallets." },
+
+    prem_eyebrow:  { ru: "Цены", en: "Pricing" },
+    prem_h2:       { ru: "Shield бесплатен. Premium открывает более тонкие правила.", en: "Shield is free. Premium unlocks deeper rules." },
+    prem_free_name:{ ru: "Бесплатно", en: "Free" },
+    free1:         { ru: "ИИ-вердикт на каждую подпись", en: "AI verdict on every signature" },
+    free2:         { ru: "Проверка по базе фишинга", en: "Phishing database check" },
+    free3:         { ru: "Проверка санкционных адресов", en: "Sanctioned address check" },
+    free4:         { ru: "Базовое декодирование calldata", en: "Basic calldata decode" },
+    prem1:         { ru: "Свои пороги риска", en: "Custom risk thresholds" },
+    prem2:         { ru: "Правила авто-отклонения &mdash; блокировка setApprovalForAll, unlimited approve и не только", en: "Auto-reject rules &mdash; block setApprovalForAll, block unlimited approve, and more" },
+    prem3:         { ru: "Проверка возраста домена в реальном времени", en: "Real-time domain age check" },
+    prem4:         { ru: "Приоритетная ИИ-модель", en: "Priority AI model" },
+
+    faq_eyebrow:   { ru: "Частые вопросы", en: "FAQ" },
+    faq_h2:        { ru: "Отвечаем на вопросы.", en: "Questions, answered." },
+    q1:            { ru: "Отправляется ли куда-нибудь мой приватный ключ?", en: "Is my private key ever sent anywhere?" },
+    a1:            { ru: "Нет. Расширение перехватывает запрос, отправляет на проверку <em>данные</em> транзакции (не ключ) и ждёт вашего решения, прежде чем кошелёк подпишет. Ключ никогда не покидает кошелёк.", en: "No. The extension intercepts the request, sends the transaction <em>data</em> (not the key) to our backend for review, and waits for your decision before letting the wallet sign. The key never leaves your wallet." },
+    q2:            { ru: "Какие кошельки поддерживаются?", en: "Which wallets are supported?" },
+    a2:            { ru: "Любой кошелёк EIP-1193 (MetaMask, Rabby, Coinbase Wallet, &hellip;) в Ethereum, Polygon, Arbitrum, Optimism, Base и BSC. Phantom в Solana. Tonkeeper в TON. Кошельки NEAR через Wallet Standard.", en: "Any EIP-1193 wallet (MetaMask, Rabby, Coinbase Wallet, &hellip;) on Ethereum, Polygon, Arbitrum, Optimism, Base, and BSC. Phantom on Solana. Tonkeeper on TON. NEAR wallets via Wallet Standard." },
+    q3:            { ru: "Нужен ли аккаунт Telegram?", en: "Do I need a Telegram account?" },
+    a3:            { ru: "Да, для привязки. 6-значный код, привязывающий расширение к вам, выдаёт Mini App в Telegram. Mini App бесплатен.", en: "Yes, for pairing. The 6-char code that binds the extension to you comes from the Telegram Mini App. The Mini App is free." },
+    q4:            { ru: "Замедляет ли это работу браузера?", en: "Does it slow down my browsing?" },
+    a4:            { ru: "Только во время запроса подписи — когда вы и так читаете окно. В простое нагрузки нет: расширение активируется, лишь когда dApp вызывает <code>window.ethereum</code> / <code>window.solana</code> и т.п.", en: "Only during a signature request, when you&rsquo;d be reading the popup anyway. Idle browsing has zero overhead &mdash; the extension only activates when a dApp calls <code>window.ethereum</code> / <code>window.solana</code> / etc." },
+    q5:            { ru: "Как удалить?", en: "How do I uninstall?" },
+    a5:            { ru: "Chrome &rarr; Управление расширениями &rarr; Удалить. Готово. Или @BLWDev_bot &rarr; Настройки &rarr; Удалить аккаунт, чтобы стереть привязку на нашей стороне.", en: "Chrome &rarr; Manage Extensions &rarr; Remove. Done. Or @BLWDev_bot &rarr; Settings &rarr; Delete account to wipe the paired record on our side." },
+    q6:            { ru: "Открытый исходный код?", en: "Open source?" },
+    a6:            { ru: "Само расширение закрыто (чтобы фишеры не смогли изучить обход). Логика бэкенд-анализатора рисков и фиды угроз задокументированы; полный отчёт об аудите — по запросу.", en: "Closed for the extension itself (so phishers can&rsquo;t reverse-engineer evasion). Backend risk-analyzer logic and threat feeds are documented; full audit report available on request." },
+
+    fin_h2:        { ru: "Перестаньте подписывать то, что не можете прочитать.", en: "Stop signing things you can&rsquo;t read." },
+    fin_micro:     { ru: "Работает в Chrome, Brave, Edge, Arc &mdash; любом браузере на Chromium.", en: "Works in Chrome, Brave, Edge, Arc &mdash; anything Chromium-based." },
+
+    foot_tag:      { ru: "Web3-безопасность для каждого.", en: "Web3 safety for everyone." },
+    foot_product:  { ru: "Продукт", en: "Product" },
+    foot_ext:      { ru: "Расширение Chrome", en: "Chrome extension" },
+    foot_miniapp:  { ru: "Открыть Mini App", en: "Open Mini App" },
+    foot_privacy:  { ru: "Конфиденциальность", en: "Privacy" },
+    foot_terms:    { ru: "Условия", en: "Terms" },
+    foot_contact:  { ru: "Контакты", en: "Contact" },
+    foot_channel:  { ru: "Канал в Telegram", en: "Telegram channel" },
+    sup_eyebrow:   { ru: "Донат", en: "Donate" },
+    sup_h2:        { ru: "Поддержать проект", en: "Support the project" },
+    sup_sub:       { ru: "Нажмите на пузырёк — адрес кошелька скопируется.", en: "Tap a bubble — the wallet address is copied." },
+    sup_copy_done: { ru: "Скопировано ✓", en: "Copied ✓" }
+  };
+
+  var nodes = document.querySelectorAll('[data-i18n]');
+  var imgNodes = document.querySelectorAll('[data-i18n-img]');
+  var btns  = document.querySelectorAll('.lang-btn');
+
+  var IMG = {
+    install:        { ru: { src: "./img/el-install-ru.png",        alt: "Установить для Chrome" },
+                      en: { src: "./img/el-install-en.png",        alt: "Install for Chrome" } },
+    step1:          { ru: { src: "./img/el-step1-ru.png",          alt: "Шаг 1 — Установка: добавьте Block Watch Shield в Chrome" },
+                      en: { src: "./img/el-step1-en.png",          alt: "Step 1 — Installation: add Block Watch Shield to Chrome" } },
+    step2:          { ru: { src: "./img/el-step2-ru.png",          alt: "Шаг 2 — Привязка: введите 6-значный код из Mini App" },
+                      en: { src: "./img/el-step2-en.png",          alt: "Step 2 — Linking: enter the 6-digit code from the Mini App" } },
+    step3:          { ru: { src: "./img/el-step3-ru.png",          alt: "Шаг 3 — Используйте: Shield показывает, что подпишет кошелёк" },
+                      en: { src: "./img/el-step3-en.png",          alt: "Step 3 — Use: Shield shows what the wallet will sign" } },
+    check_phish:    { ru: { src: "./img/el-check-phish-ru.png",    alt: "Фишинговые домены — проверка по базе MetaMask eth-phishing-detect" },
+                      en: { src: "./img/el-check-phish-en.png",    alt: "Phishing domains — MetaMask eth-phishing-detect database check" } },
+    check_calldata: { ru: { src: "./img/el-check-calldata-ru.png", alt: "Декодирование calldata — approve, setApprovalForAll, Permit, Permit2, EIP-712" },
+                      en: { src: "./img/el-check-calldata-en.png", alt: "Calldata decoding — approve, setApprovalForAll, Permit, Permit2, EIP-712" } },
+    check_sanctioned: { ru: { src: "./img/el-check-sanctioned-ru.png", alt: "Адреса под санкциями — список OFAC SDN синхронизируется ежедневно" },
+                      en: { src: "./img/el-check-sanctioned-en.png", alt: "Addresses under sanctions — OFAC SDN list synchronized daily" } },
+    check_domain:   { ru: { src: "./img/el-check-domain-ru.png",   alt: "Репутация домена — сверка с каталогом известных dApp" },
+                      en: { src: "./img/el-check-domain-en.png",   alt: "Domain reputation — checked against a known-dApps catalog" } }
+  };
+
+  function setLang(lang) {
+    if (lang !== 'ru' && lang !== 'en') lang = 'ru';
+    document.documentElement.lang = lang;
+    nodes.forEach(function (el) {
+      var k = el.getAttribute('data-i18n');
+      if (I18N[k] && I18N[k][lang] != null) el.innerHTML = I18N[k][lang];
+    });
+    imgNodes.forEach(function (el) {
+      var k = el.getAttribute('data-i18n-img');
+      if (IMG[k] && IMG[k][lang]) { el.src = IMG[k][lang].src; el.alt = IMG[k][lang].alt; }
+    });
+    btns.forEach(function (b) { b.classList.toggle('on', b.dataset.lang === lang); });
+    try { localStorage.setItem('bw_lang', lang); } catch (e) {}
+  }
+
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () { setLang(b.dataset.lang); });
+  });
+
+  var saved = 'ru';
+  try { saved = localStorage.getItem('bw_lang') || 'ru'; } catch (e) {}
+  setLang(saved);
+})();
+
+/* Copy-to-clipboard for donate wallet buttons. */
+(function () {
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+    } catch (e) {}
+  }
+  document.querySelectorAll('.donate-orb').forEach(function (card) {
+    card.addEventListener('click', function () {
+      var addr = card.getAttribute('data-address');
+      var show = function () {
+        card.classList.add('copied');
+        clearTimeout(card._t);
+        card._t = setTimeout(function () { card.classList.remove('copied'); }, 1700);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(addr).then(show, function () { fallbackCopy(addr); show(); });
+      } else { fallbackCopy(addr); show(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
