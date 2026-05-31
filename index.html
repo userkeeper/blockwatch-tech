@@ -152,7 +152,9 @@ html, body {
    =================================================================== */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { overflow-x: hidden; }
+/* Belt-and-braces: prevent any stray wide element from triggering Android
+   Chrome's auto-zoom-to-fit-content behavior. Both html and body need it. */
+html, body { overflow-x: hidden; max-width: 100vw; }
 
 img { display: block; max-width: 100%; }
 a { color: var(--accent); text-decoration: none; }
@@ -646,7 +648,7 @@ footer {
   <section class="hero" data-screen-label="hero">
     <div class="wrap">
       <img class="hero-emblem" src="./nav-shield.png" alt="Эмблема Block Watch Shield" />
-      <h1 class="heading-gradient" data-i18n="hero_h1" style="width: 800px; margin: 2px 132px 22px">Читайте каждую транзакцию до того, как кошелёк её подпишет.</h1>
+      <h1 class="heading-gradient" data-i18n="hero_h1">Читайте каждую транзакцию до того, как кошелёк её подпишет.</h1>
       <p class="lead" data-i18n="hero_lead">Block Watch Shield проверяет каждую подпись в dApp с помощью ИИ, прежде чем MetaMask, Phantom или Tonkeeper её подпишут.</p>
       <a class="cta-install" href="https://chrome.google.com/webstore/..." target="_blank" rel="noopener"><img data-i18n-img="install" src="./img/el-install-ru.png" alt="Установить для Chrome" /></a>
       <p class="hero-micro" data-i18n="hero_micro">Работает с MetaMask, Rabby, Coinbase Wallet, Phantom, Tonkeeper. Приватные ключи не покидают браузер.</p>
@@ -733,12 +735,12 @@ footer {
         <h2 class="heading-gradient" data-i18n="chk_h2">Четыре проверки на каждый запрос.</h2>
       </div>
       <div class="checks-stack">
-        <img class="check-img reveal" data-i18n-img="check_phish" src="./img/el-check-phish-ru.png" alt="Фишинговые домены — проверка по базе MetaMask eth-phishing-detect" style="width: 480px; height: 220px" />
+        <img class="check-img reveal" data-i18n-img="check_phish" src="./img/el-check-phish-ru.png" alt="Фишинговые домены — проверка по базе MetaMask eth-phishing-detect" />
 
-        <img class="check-img reveal" data-i18n-img="check_sanctioned" src="./img/el-check-sanctioned-ru.png" alt="Адреса под санкциями — список OFAC SDN синхронизируется ежедневно" style="width: 480px; height: 220px" />
+        <img class="check-img reveal" data-i18n-img="check_sanctioned" src="./img/el-check-sanctioned-ru.png" alt="Адреса под санкциями — список OFAC SDN синхронизируется ежедневно" />
 
-        <img class="check-img reveal" data-i18n-img="check_calldata" src="./img/el-check-calldata-ru.png" alt="Декодирование calldata — approve, setApprovalForAll, Permit, Permit2, EIP-712" style="width: 480px; height: 220px" />
-        <img class="check-img reveal" data-i18n-img="check_domain" src="./img/el-check-domain-ru.png" alt="Репутация домена — сверка с каталогом известных dApp" style="width: 480px; height: 220px" />
+        <img class="check-img reveal" data-i18n-img="check_calldata" src="./img/el-check-calldata-ru.png" alt="Декодирование calldata — approve, setApprovalForAll, Permit, Permit2, EIP-712" />
+        <img class="check-img reveal" data-i18n-img="check_domain" src="./img/el-check-domain-ru.png" alt="Репутация домена — сверка с каталогом известных dApp" />
       </div>
     </div>
   </section>
