@@ -17,7 +17,7 @@
 <!-- JetBrains Mono — dev-style mono used for headlines / labels -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
 <style>
   /* ─── Palette mirrors blockwatch.tech main site ─── */
@@ -41,7 +41,7 @@
     margin: 0; padding: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
       Roboto, "Helvetica Neue", sans-serif;
     line-height: 1.55;
     overflow-x: hidden;
@@ -53,10 +53,9 @@
     background-attachment: fixed;
   }
 
-  /* ─── Snap-scroll block layout ─── */
-  html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+  /* ─── Block layout — JS handles slide-deck advance ─── */
+  html { scroll-behavior: smooth; }
   section.block {
-    scroll-snap-align: start;
     min-height: 100vh;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
@@ -64,7 +63,7 @@
     position: relative;
   }
   section.block h1, section.block h2 {
-    font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
     font-weight: 700;
     letter-spacing: -0.01em;
     text-align: center;
@@ -96,12 +95,12 @@
     color: var(--text); text-decoration: none;
     font-weight: 600; font-size: 18px;
     display: flex; align-items: center; gap: 10px;
-    font-family: "JetBrains Mono", monospace;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
   }
   nav.top a.brand img { width: 28px; height: 28px; }
   nav.top .links a {
     color: var(--text-muted); text-decoration: none; margin-left: 22px;
-    font-size: 14px; font-family: "JetBrains Mono", monospace;
+    font-size: 14px; font-family: "IBM Plex Mono", ui-monospace, monospace;
     transition: color 180ms;
   }
   nav.top .links a.active, nav.top .links a:hover { color: var(--text); }
@@ -115,49 +114,25 @@
   }
   .news-collage .clip {
     position: absolute;
-    background: var(--paper);
-    color: var(--paper-ink);
-    padding: 16px 20px 18px;
     max-width: 320px;
+    height: auto;
     box-shadow:
-      0 1px 0 rgba(0, 0, 0, 0.3) inset,
       0 14px 30px rgba(0, 0, 0, 0.55),
       0 4px 8px rgba(0, 0, 0, 0.35);
     transform: rotate(var(--rot, 0deg));
-    /* Slight uneven torn-paper edge via clip-path */
+    border-radius: 3px;
+    /* Slight torn-edge clip-path to feel like a paper cutout */
     clip-path: polygon(
       2% 4%, 96% 0%, 99% 8%, 100% 96%,
       94% 100%, 6% 98%, 0% 90%, 1% 6%
     );
-    font-family: Georgia, "Times New Roman", serif;
   }
-  .news-collage .clip::after {
-    content: ""; position: absolute; inset: 0;
-    background:
-      radial-gradient(ellipse at 30% 20%, rgba(0,0,0,0.05), transparent 60%),
-      radial-gradient(ellipse at 80% 80%, rgba(0,0,0,0.07), transparent 70%);
-    pointer-events: none;
-  }
-  .news-collage .clip .src {
-    color: #5a4a30;
-    font-size: 11px; font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 6px;
-    font-family: "JetBrains Mono", monospace;
-  }
-  .news-collage .clip h3 {
-    font-size: 15px; margin: 0;
-    color: var(--paper-ink);
-    line-height: 1.35;
-    font-weight: 700;
-  }
-  .clip-1 { top: 4%;  left:  4%; --rot: -6deg; }
-  .clip-2 { top: 12%; right: 6%; --rot: 5deg;  }
-  .clip-3 { top: 40%; left: 22%; --rot: -3deg; }
-  .clip-4 { top: 38%; right:22%; --rot: 4deg;  }
-  .clip-5 { top: 72%; left:  6%; --rot: -5deg; }
-  .clip-6 { top: 70%; right: 4%; --rot: 6deg;  }
+  /* 5-image layout: top row (2), centre (1), bottom row (2) */
+  .clip-1 { top:  5%; left:  5%;  --rot: -6deg; }
+  .clip-2 { top: 10%; right: 6%;  --rot: 5deg;  }
+  .clip-3 { top: 40%; left: 50%; margin-left: -160px; --rot: -2deg; }
+  .clip-4 { top: 70%; left:  6%;  --rot: -5deg; }
+  .clip-5 { top: 72%; right: 5%;  --rot: 6deg;  }
 
   .news-collage svg.arrow {
     position: absolute; pointer-events: none;
@@ -169,7 +144,7 @@
   .quote-block {
     max-width: 900px;
     text-align: center;
-    font-family: "JetBrains Mono", monospace;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: clamp(22px, 2.8vw, 34px);
     line-height: 1.5;
     color: var(--text);
@@ -197,19 +172,22 @@
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    font-family: "JetBrains Mono", monospace;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: clamp(28px, 4vw, 44px);
     font-weight: 700;
-    color: var(--text);
+    color: var(--text-muted);
     cursor: pointer;
-    padding: 16px 32px;
-    border: 2px solid var(--border-strong);
-    border-radius: 10px;
-    background: var(--surface);
-    transition: color 200ms, border-color 200ms;
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    transition: color 200ms, letter-spacing 200ms;
     white-space: nowrap;
+    letter-spacing: 0.02em;
   }
-  .qr-stage .qr-label:hover { color: var(--accent); border-color: var(--accent); }
+  .qr-stage .qr-label:hover {
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
   .qr-stage:has(.qr-label:hover) img.qr { filter: blur(18px); }
 
   /* ─── §4: All-secrets editor on Mac ─── */
@@ -257,34 +235,46 @@
      target region in the screenshot. Adjust margins below if the
      screenshot layout changes. */
   .label-column {
-    display: flex; flex-direction: column;
     position: relative;
     height: 100%;
-    padding-top: 24%;       /* aligns first label with seed line */
-    gap: 0;
+    width: 100%;
   }
+  /* Position each label at the same top% as its target region in the
+     screenshot so they line up horizontally on the right side. */
+  .label-column .secret-label[data-target="seed"]    { top: 24.5%; }
+  .label-column .secret-label[data-target="privkey"] { top: 41.5%; }
+  .label-column .secret-label[data-target="api"]     { top: 61.0%; }
   .label-column .secret-label {
-    font-family: "JetBrains Mono", monospace;
+    position: absolute;
+    right: 0;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: clamp(18px, 2.0vw, 26px);
-    font-weight: 700;
-    color: var(--text);
+    font-weight: 600;
+    color: var(--text-muted);
     cursor: pointer;
-    padding: 14px 22px;
-    border: 2px solid var(--border-strong);
-    border-radius: 10px;
-    background: var(--surface);
-    text-align: center;
-    transition: color 200ms, border-color 200ms, background 200ms;
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    text-align: right;
+    letter-spacing: 0.02em;
+    transition: color 200ms, transform 200ms;
+    white-space: nowrap;
+  }
+  .label-column .secret-label::before {
+    content: "› ";
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 200ms;
   }
   .label-column .secret-label:hover {
     color: var(--accent);
-    border-color: var(--accent);
-    background: var(--accent-soft);
+    transform: translateX(-6px);
   }
+  .label-column .secret-label:hover::before { opacity: 1; }
   /* Vertical spacing between labels to mirror gaps between secret
      regions in the screenshot (seed → privkey ≈ 15% gap, privkey →
      api ≈ 17% gap). Tuned visually. */
-  .label-column .secret-label + .secret-label { margin-top: 12%; }
+
 
   /* ─── §5: Phantom — blur only the popup, not whole screen ─── */
   .phantom-stage {
@@ -310,7 +300,10 @@
      sits in your screenshot. */
   .region-wallet {
     position: absolute;
-    top: 5%; left: 65%; width: 32%; height: 88%;
+    /* Phantom popup occupies the right portion of chrome-phantom.png.
+       Tuned to the actual screenshot — popup starts ~67% from left,
+       top header at 10%, fills almost to bottom of image. */
+    top: 10%; left: 67%; width: 33%; height: 85%;
     pointer-events: none;
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
@@ -327,22 +320,29 @@
     height: 100%;
   }
   .phantom-label {
-    font-family: "JetBrains Mono", monospace;
-    font-size: clamp(20px, 2.4vw, 30px);
-    font-weight: 700;
-    color: var(--text);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: clamp(22px, 2.6vw, 32px);
+    font-weight: 600;
+    color: var(--text-muted);
     cursor: pointer;
-    padding: 18px 28px;
-    border: 2px solid var(--border-strong);
-    border-radius: 10px;
-    background: var(--surface);
-    transition: color 200ms, border-color 200ms, background 200ms;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    text-align: center;
+    letter-spacing: 0.02em;
+    transition: color 200ms, transform 200ms;
+  }
+  .phantom-label::before {
+    content: "› ";
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 200ms;
   }
   .phantom-label:hover {
     color: var(--accent);
-    border-color: var(--accent);
-    background: var(--accent-soft);
+    transform: translateX(-6px);
   }
+  .phantom-label:hover::before { opacity: 1; }
 
   /* ─── §7..§9: One photo per block — swap to blur on hover ─── */
   .photo-block {
@@ -350,25 +350,56 @@
   }
   .photo-block .swap {
     position: relative;
-    width: min(60vw, 540px);
-    aspect-ratio: 1/1;
+    max-width: min(80vw, 700px);
+    max-height: 75vh;
     border-radius: 14px;
     overflow: hidden;
     cursor: pointer;
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+    display: inline-block;
   }
-  .photo-block .swap img {
+  .photo-block .swap img.original {
+    display: block;
+    width: 100%; height: auto;
+    max-height: 75vh;
+    object-fit: contain;
+    transition: opacity 300ms ease;
+  }
+  .photo-block .swap img.blurred {
     position: absolute; inset: 0;
-    width: 100%; height: 100%; object-fit: cover;
+    width: 100%; height: 100%;
+    object-fit: cover;
     transition: opacity 300ms ease;
   }
   .photo-block .swap img.blurred { opacity: 0; }
   .photo-block .swap:hover img.original { opacity: 0; }
   .photo-block .swap:hover img.blurred { opacity: 1; }
 
+  /* ─── Typewriter effect ─── */
+  [data-typewrite] {
+    position: relative;
+    display: inline-block;
+    min-height: 1.2em;
+  }
+  [data-typewrite].typing::after {
+    content: "▌";
+    display: inline-block;
+    color: var(--accent);
+    animation: caret-blink 0.8s steps(2, end) infinite;
+    margin-left: 2px;
+  }
+  @keyframes caret-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+  /* Wrap typewrite around quote blocks too — keep their line breaks */
+  .quote-block[data-typewrite] {
+    display: block;
+    white-space: pre-line;
+  }
   /* ─── Final CTA ─── */
   section.block.final p {
-    font-family: "JetBrains Mono", monospace;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: clamp(22px, 2.6vw, 30px);
     max-width: 800px; line-height: 1.5; text-align: center;
     margin: 0 0 18px;
@@ -384,7 +415,7 @@
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
     color: white; text-decoration: none;
     border-radius: 999px;
-    font-family: "JetBrains Mono", monospace;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-weight: 600;
     font-size: 16px;
     transition: transform 150ms;
@@ -392,7 +423,6 @@
   section.block.final a.btn:hover { transform: scale(1.05); }
 
   @media (max-width: 720px) {
-    html { scroll-snap-type: none; }
     section.block { min-height: auto; padding: 80px 18px 40px; }
     .secrets-stage, .phantom-stage {
       grid-template-columns: 1fr;
@@ -418,34 +448,15 @@
   </div>
 </nav>
 
-<!-- §1: News cutouts -->
+<!-- §1: News cutouts — actual screenshots from news sites -->
 <section class="block" id="news">
-  <h1>Streamers теряют деньги на live</h1>
+  <h1 data-typewrite>Streamers теряют деньги на live</h1>
   <div class="news-collage">
-    <div class="clip clip-1">
-      <div class="src">The Crypto Times · ноябрь 2024</div>
-      <h3>Crypto Streamer Loses $100K After Seed Phrase Leak on Stream</h3>
-    </div>
-    <div class="clip clip-2">
-      <div class="src">Cointelegraph · сентябрь 2023</div>
-      <h3>Brazilian crypto streamer loses $50K MATIC by exposing private key</h3>
-    </div>
-    <div class="clip clip-3">
-      <div class="src">Sportskeeda Esports</div>
-      <h3>Crypto streamer accidentally leaks private keys — viewers steal $60K</h3>
-    </div>
-    <div class="clip clip-4">
-      <div class="src">Bitget News · 2024</div>
-      <h3>Solana wallet drained: $100,000 FWOG stash stolen within seconds</h3>
-    </div>
-    <div class="clip clip-5">
-      <div class="src">@PatrickAlphaC · ноябрь 2024</div>
-      <h3>"Don't ever have your seed phrase or private key in plain text. Keystroke sounds on stream can be reversed."</h3>
-    </div>
-    <div class="clip clip-6">
-      <div class="src">GitGuardian · Twitch leak postmortem</div>
-      <h3>В одном дампе: 194 AWS-ключа, 68 Google API, 4 Stripe, 14 GitHub OAuth</h3>
-    </div>
+    <img class="clip clip-1" src="/img/news-1.png" alt="" />
+    <img class="clip clip-2" src="/img/news-2.png" alt="" />
+    <img class="clip clip-3" src="/img/news-3.png" alt="" />
+    <img class="clip clip-4" src="/img/news-4.png" alt="" />
+    <img class="clip clip-5" src="/img/news-5.png" alt="" />
     <svg class="arrow" style="top:25%; left:30%; width:140px; height:90px;">
       <path d="M0,45 C50,5 90,85 140,45" />
       <polygon points="135,40 145,45 135,50" fill="currentColor" stroke="none"/>
@@ -459,7 +470,7 @@
 
 <!-- §2: Lead quote (now its own block) -->
 <section class="block" id="why">
-  <p class="quote-block">
+  <p class="quote-block" data-typewrite>
     …и именно поэтому мы решили заблюрить <span class="accent">всё</span>,
     ну почти всё, <br/>до того как сцену увидит зритель.
   </p>
@@ -467,7 +478,7 @@
 
 <!-- §3: QR -->
 <section class="block" id="qr">
-  <h2>А ещё QR-коды</h2>
+  <h2 data-typewrite>А ещё QR-коды</h2>
   <div class="qr-stage">
     <img class="qr tl" src="/img/qr-tl.png" alt="" />
     <img class="qr tr" src="/img/qr-tr.png" alt="" />
@@ -479,7 +490,7 @@
 
 <!-- §4: Editor with seed/privkey/api -->
 <section class="block" id="secrets">
-  <h2>А ещё — всё, что не должно покидать твой Mac</h2>
+  <h2 data-typewrite>А ещё — всё, что не должно покидать твой Mac</h2>
   <div class="secrets-stage">
     <div class="shot-wrap">
       <img class="shot" src="/img/all-secrets.png" alt="Editor with secrets" />
@@ -497,7 +508,7 @@
 
 <!-- §5: Phantom — blur only the popup region -->
 <section class="block" id="phantom">
-  <h2>Не успел спрятать Phantom?</h2>
+  <h2 data-typewrite>Не успел спрятать Phantom?</h2>
   <div class="phantom-stage">
     <div class="phantom-label-side">
       <div class="phantom-label">Весь кошелёк</div>
@@ -511,7 +522,7 @@
 
 <!-- §6: Transition -->
 <section class="block" id="transition">
-  <p class="quote-block">
+  <p class="quote-block" data-typewrite>
     Мы могли бы заблюрить всё что угрожает твоему финансовому
     состоянию или портит тебе настроение…
   </p>
@@ -541,12 +552,129 @@
 
 <!-- §10: Final CTA -->
 <section class="block final" id="final">
-  <p>…но это не наш профиль.</p>
-  <p class="signoff">Наша работа — твоя безопасность.</p>
+  <p data-typewrite>…но это не наш профиль.</p>
+  <p class="signoff" data-typewrite>Наша работа — твоя безопасность.</p>
   <a class="btn" href="https://t.me/BWDevapp" target="_blank">
     Получить ранний доступ
   </a>
 </section>
 
+
+<script>
+/* ─── Typewriter ─── */
+function typewriteElement(el) {
+  if (el.dataset.typed === "1") return;
+  var full = el.dataset.text || el.textContent;
+  if (!el.dataset.text) el.dataset.text = full;
+  el.textContent = "";
+  el.classList.add("typing");
+  el.dataset.typed = "1";
+  var i = 0;
+  var speed = Math.max(20, Math.min(60, 1200 / full.length));
+  function step() {
+    if (i >= full.length) {
+      el.classList.remove("typing");
+      return;
+    }
+    el.textContent += full.charAt(i);
+    i++;
+    setTimeout(step, speed);
+  }
+  step();
+}
+
+function activateTypewritersIn(section) {
+  section.querySelectorAll("[data-typewrite]").forEach(typewriteElement);
+}
+
+/*
+ * Slide-deck-style block navigation.
+ *
+ * Default browser scrolling is continuous — even with scroll-snap the
+ * user can "see" the in-between content while it snaps. We override:
+ * every wheel event / arrow-key press fires `scrollIntoView` on the
+ * NEXT section, smoothly transitioning to it. Between events the
+ * user can't "land" between sections; the page feels like a slide
+ * deck advancing.
+ */
+(function () {
+  var sections = Array.prototype.slice.call(document.querySelectorAll("section.block"));
+  var current = 0;
+  var locked = false;
+
+  function go(idx) {
+    if (idx < 0 || idx >= sections.length) return;
+    locked = true;
+    current = idx;
+    sections[idx].scrollIntoView({ behavior: "smooth", block: "start" });
+    // Kick off typewriter for any data-typewrite elements in the
+    // section once the scroll settles.
+    setTimeout(function () {
+      activateTypewritersIn(sections[idx]);
+      locked = false;
+    }, 800);
+  }
+
+  // Find which section is currently in view on load / after manual scroll
+  function recalcCurrent() {
+    var midpoint = window.scrollY + window.innerHeight / 2;
+    for (var i = 0; i < sections.length; i++) {
+      var top = sections[i].offsetTop;
+      var bottom = top + sections[i].offsetHeight;
+      if (midpoint >= top && midpoint < bottom) {
+        current = i;
+        return;
+      }
+    }
+  }
+
+  window.addEventListener("wheel", function (e) {
+    if (locked) { e.preventDefault(); return; }
+    e.preventDefault();
+    recalcCurrent();
+    if (e.deltaY > 30) go(current + 1);
+    else if (e.deltaY < -30) go(current - 1);
+  }, { passive: false });
+
+  window.addEventListener("keydown", function (e) {
+    if (locked) return;
+    recalcCurrent();
+    if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
+      e.preventDefault();
+      go(current + 1);
+    } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+      e.preventDefault();
+      go(current - 1);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      go(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      go(sections.length - 1);
+    }
+  });
+
+  // Touch swipe handling (mobile)
+  var touchY = null;
+  window.addEventListener("touchstart", function (e) {
+    touchY = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener("touchend", function (e) {
+    if (touchY === null || locked) return;
+    var dy = touchY - e.changedTouches[0].clientY;
+    if (Math.abs(dy) < 50) return;
+    recalcCurrent();
+    if (dy > 0) go(current + 1);
+    else go(current - 1);
+    touchY = null;
+  }, { passive: true });
+  // Trigger typewriter for the section visible on initial load.
+  setTimeout(function () {
+    recalcCurrent();
+    activateTypewritersIn(sections[current]);
+  }, 250);
+})();
+</script>
 </body>
 </html>
+                     
