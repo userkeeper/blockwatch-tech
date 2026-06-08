@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<!--
+  shield-studio.html — second tab on blockwatch.tech for the Shield
+  Studio product (the streamer screen-blur virtual camera). Scroll-
+  driven storytelling: each section is a single visual claim, hover
+  interactions reveal the blur in place.
+-->
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BlockWatch Shield Studio — Защита экрана для стримеров</title>
+<meta name="description" content="Виртуальная камера которая блюрит криптокошельки, seed-фразы и API-ключи на трансляции до того как кадр уйдёт зрителю." />
+<link rel="canonical" href="https://blockwatch.tech/shield-studio.html" />
+
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://blockwatch.tech/shield-studio.html" />
+<meta property="og:title" content="BlockWatch Shield Studio — защита экрана стримера" />
+<meta property="og:description" content="Виртуальная камера которая блюрит секреты до того как кадр уйдёт зрителю." />
+<meta property="og:image" content="https://blockwatch.tech/og-shield-studio.png" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" type="image/png" href="/logo.png" />
+
+<style>
+  /* ─── Global ─────────────────────────────────────────── */
+  :root {
+    --bg: #0a0a0f;
+    --fg: #f0f0f5;
+    --accent: #7c3aed;
+    --muted: #888;
+    --card: #14141c;
+    --warn: #ff3838;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+      "Helvetica Neue", Arial, sans-serif;
+    overflow-x: hidden;
+  }
+  a { color: var(--accent); }
+  img { user-select: none; -webkit-user-drag: none; }
+
+  /* ─── Nav ────────────────────────────────────────────── */
+  nav.top {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    border-bottom: 1px solid #1f1f28;
+  }
+  nav.top a.brand {
+    color: var(--fg); text-decoration: none;
+    font-weight: 600; font-size: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  nav.top a.brand img { width: 28px; height: 28px; }
+  nav.top .links a {
+    color: var(--muted); text-decoration: none; margin-left: 22px;
+    font-size: 14px;
+  }
+  nav.top .links a.active { color: var(--fg); }
+
+  /* ─── Section wrapper ────────────────────────────────── */
+  section.scene {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 80px 24px;
+    position: relative;
+  }
+  section.scene h1, section.scene h2, section.scene h3 {
+    text-align: center; max-width: 900px;
+    line-height: 1.3;
+  }
+  section.scene h1 { font-size: clamp(28px, 4vw, 48px); margin: 30px 0; }
+  section.scene h2 { font-size: clamp(22px, 3vw, 36px); margin: 24px 0; }
+  section.scene p.lead {
+    font-size: clamp(16px, 1.7vw, 20px);
+    color: #c0c0cc;
+    text-align: center;
+    max-width: 800px;
+    line-height: 1.6;
+  }
+
+  /* ─── §1: News collage ───────────────────────────────── */
+  .news-collage {
+    position: relative;
+    width: 100%; max-width: 1100px;
+    height: 520px;
+    margin: 20px auto 40px;
+  }
+  .news-collage .clip {
+    position: absolute;
+    background: var(--card);
+    border: 1px solid #2a2a36;
+    padding: 14px 18px;
+    border-radius: 6px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    max-width: 280px;
+    font-size: 14px;
+    line-height: 1.4;
+    transform: rotate(var(--rot, 0deg));
+  }
+  .news-collage .clip .src { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+  .news-collage .clip h3 { font-size: 15px; margin: 0; color: var(--warn); }
+
+  /* Hard-coded positions for each headline cutout */
+  .clip-1 { top: 0;    left: 5%;  --rot: -7deg; }
+  .clip-2 { top: 50px; right: 8%; --rot: 6deg;  }
+  .clip-3 { top: 180px; left: 25%; --rot: -3deg; }
+  .clip-4 { top: 250px; right: 25%; --rot: 4deg; }
+  .clip-5 { top: 360px; left: 8%;  --rot: -5deg; }
+  .clip-6 { top: 400px; right: 5%;  --rot: 5deg; }
+
+  /* SVG arrow overlays */
+  .news-collage svg.arrow {
+    position: absolute; pointer-events: none;
+    stroke: var(--warn); fill: none; stroke-width: 2;
+  }
+
+  /* ─── §2: QR section ─────────────────────────────────── */
+  .qr-stage {
+    position: relative;
+    width: 100%; max-width: 900px;
+    aspect-ratio: 4/3;
+    margin: 30px auto;
+  }
+  .qr-stage img.qr {
+    position: absolute;
+    width: 24%;
+    transition: filter 350ms ease;
+  }
+  .qr-stage img.qr.tl { top: 0; left: 0; }
+  .qr-stage img.qr.tr { top: 0; right: 0; }
+  .qr-stage img.qr.bl { bottom: 0; left: 0; }
+  .qr-stage img.qr.br { bottom: 0; right: 0; }
+  .qr-stage .center-label {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    color: var(--fg);
+    cursor: pointer;
+    transition: color 200ms;
+  }
+  .qr-stage .center-label:hover { color: var(--accent); }
+  .qr-stage:has(.center-label:hover) img.qr {
+    filter: blur(18px);
+  }
+
+  /* ─── §4: Phantom whole-wallet (separate full-image blur) ── */
+  .phantom-stage {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 40px;
+    width: 100%; max-width: 1200px;
+    margin: 24px auto;
+    align-items: center;
+  }
+  .phantom-stage .label-side {
+    display: flex; justify-content: center;
+  }
+  .phantom-stage .phantom-shot {
+    width: 100%; border-radius: 8px;
+    border: 1px solid #2a2a36;
+    transition: filter 350ms ease;
+  }
+  .phantom-stage:has(.phantom-label:hover) .phantom-shot { filter: blur(22px); }
+  .phantom-stage .phantom-label {
+    font-size: clamp(22px, 3vw, 36px);
+    font-weight: 700;
+    color: var(--fg);
+    cursor: pointer;
+    transition: color 200ms;
+    padding: 18px 28px;
+    border: 2px solid #2a2a36;
+    border-radius: 12px;
+    background: var(--card);
+    text-align: center;
+  }
+  .phantom-stage .phantom-label:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ─── §3-4: Combined single-screen with overlays ─────── */
+  .combined-stage {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 32px;
+    width: 100%; max-width: 1300px;
+    margin: 24px auto;
+    align-items: center;
+  }
+  .shot-wrap {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #2a2a36;
+    aspect-ratio: 1535 / 1800;
+  }
+  .shot-wrap img.shot {
+    display: block;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .shot-wrap .region {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 4px;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    transition: backdrop-filter 320ms ease,
+                -webkit-backdrop-filter 320ms ease,
+                background-color 320ms ease;
+  }
+  /*
+    Coordinates of each blur region as percentages of the screenshot.
+    These are the EXPECTED layout — adjust to match your actual
+    all-secrets.png. Reference layout: Notepad on left half (seed
+    near top, privkey middle, api bottom), Phantom popup on right.
+  */
+  /* Coordinates derived from the actual all-secrets.png layout:
+     TextEdit window vertically, seed near top, privkey in the
+     middle, AWS/GH/Stripe/OpenAI lines further down. */
+  .region-seed    { top: 13.0%; left: 1.5%; width: 93%; height: 3.5%; }
+  .region-privkey { top: 20.5%; left: 1.5%; width: 93%; height: 4.5%; }
+  .region-api     { top: 29.0%; left: 1.5%; width: 93%; height: 8.5%; }
+
+  /* On label hover via :has() — turn the matching region into a blur. */
+  .combined-stage:has([data-target="seed"]:hover)    .region-seed,
+  .combined-stage:has([data-target="privkey"]:hover) .region-privkey,
+  .combined-stage:has([data-target="api"]:hover)     .region-api {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    background-color: rgba(20, 20, 28, 0.15);
+  }
+
+  .label-column {
+    display: flex; flex-direction: column;
+    gap: 18px;
+  }
+  .label-column .secret-label {
+    font-size: clamp(20px, 2.4vw, 28px);
+    font-weight: 700;
+    color: var(--fg);
+    cursor: pointer;
+    transition: color 200ms, border-color 200ms, transform 150ms;
+    padding: 16px 22px;
+    border: 2px solid #2a2a36;
+    border-radius: 12px;
+    background: var(--card);
+    text-align: center;
+  }
+  .label-column .secret-label:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    transform: translateX(-6px);
+  }
+
+  /* ─── §6: Photo swap-to-blur grid ────────────────────── */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    width: 100%; max-width: 1100px;
+    margin: 24px auto;
+  }
+  .photo-grid .swap {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+  }
+  .photo-grid .swap img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover;
+    transition: opacity 320ms ease;
+  }
+  .photo-grid .swap img.blurred {
+    opacity: 0;
+  }
+  .photo-grid .swap:hover img.original { opacity: 0; }
+  .photo-grid .swap:hover img.blurred { opacity: 1; }
+
+  /* ─── CTA footer ─────────────────────────────────────── */
+  .cta-final {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 20px;
+    padding: 60px 24px 120px;
+    text-align: center;
+  }
+  .cta-final p {
+    font-size: clamp(20px, 2.6vw, 28px);
+    max-width: 700px; line-height: 1.5; color: var(--fg);
+  }
+  .cta-final .signoff {
+    color: var(--accent);
+    font-size: clamp(18px, 2.4vw, 24px);
+    font-weight: 600;
+  }
+  .cta-final a.btn {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 16px 32px;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: transform 150ms;
+  }
+  .cta-final a.btn:hover { transform: scale(1.05); }
+
+  @media (max-width: 720px) {
+    .combined-stage, .phantom-stage { grid-template-columns: 1fr; }
+    .news-collage { height: 700px; }
+    .news-collage .clip { max-width: 210px; font-size: 13px; }
+    nav.top .links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <a class="brand" href="/">
+    <img src="/logo.png" alt="" />
+    BlockWatch
+  </a>
+  <div class="links">
+    <a href="/">Shield Extension</a>
+    <a href="/shield-studio.html" class="active">Shield Studio</a>
+    <a href="https://t.me/BWDevapp" target="_blank">Telegram</a>
+  </div>
+</nav>
+
+<!-- ─── §1 ─── -->
+<section class="scene" id="news">
+  <h1>Streamers теряют деньги на live</h1>
+  <div class="news-collage">
+    <div class="clip clip-1">
+      <div class="src">The Crypto Times · ноябрь 2024</div>
+      <h3>Crypto Streamer Loses $100K After Seed Phrase Leak on Stream</h3>
+    </div>
+    <div class="clip clip-2">
+      <div class="src">Cointelegraph · сентябрь 2023</div>
+      <h3>Brazilian crypto streamer loses $50K MATIC by accidentally exposing private key</h3>
+    </div>
+    <div class="clip clip-3">
+      <div class="src">Sportskeeda Esports</div>
+      <h3>Crypto streamer accidentally leaks private keys on stream — viewers steal $60K from his account</h3>
+    </div>
+    <div class="clip clip-4">
+      <div class="src">Bitget News · 2024</div>
+      <h3>Solana wallet drained: streamer's FWOG stash worth $100,000 stolen within seconds</h3>
+    </div>
+    <div class="clip clip-5">
+      <div class="src">@PatrickAlphaC · ноябрь 2024</div>
+      <h3>"Don't ever have your seed phrase or private key in plain text. Don't enter passwords on stream — keystroke sounds can be reversed."</h3>
+    </div>
+    <div class="clip clip-6">
+      <div class="src">GitGuardian · Twitch leak postmortem</div>
+      <h3>В одном дампе утекло 194 AWS-ключа, 68 Google API ключей, 4 Stripe, 14 GitHub OAuth</h3>
+    </div>
+
+    <!-- Connecting arrows -->
+    <svg class="arrow" style="top:120px; left:25%; width:120px; height:80px;">
+      <path d="M0,40 C40,0 80,80 120,40" />
+      <polygon points="115,35 125,40 115,45" fill="var(--warn)" stroke="none"/>
+    </svg>
+    <svg class="arrow" style="top:200px; right:25%; width:120px; height:80px;">
+      <path d="M120,40 C80,0 40,80 0,40" />
+      <polygon points="5,35 -5,40 5,45" fill="var(--warn)" stroke="none"/>
+    </svg>
+    <svg class="arrow" style="top:300px; left:20%; width:200px; height:100px;">
+      <path d="M0,60 C70,0 130,100 200,60" />
+      <polygon points="195,55 205,60 195,65" fill="var(--warn)" stroke="none"/>
+    </svg>
+  </div>
+  <p class="lead">
+    …и именно поэтому мы решили заблюрить всё, ну почти всё,
+    до того как сцену увидит зритель.
+  </p>
+</section>
+
+<!-- ─── §2: QR ─── -->
+<section class="scene" id="qr">
+  <div class="qr-stage">
+    <img class="qr tl" src="/img/qr-tl.png" alt="QR top-left" />
+    <img class="qr tr" src="/img/qr-tr.png" alt="QR top-right" />
+    <img class="qr bl" src="/img/qr-bl.png" alt="QR bottom-left" />
+    <img class="qr br" src="/img/qr-br.png" alt="QR bottom-right" />
+    <div class="center-label">QR коды</div>
+  </div>
+  <p class="lead">Наведи на надпись.</p>
+</section>
+
+<!-- ─── §4: Phantom on Chrome — separate shot, one big label ─── -->
+<section class="scene" id="phantom">
+  <h2>Не успел спрятать Phantom?</h2>
+  <div class="phantom-stage">
+    <div class="label-side">
+      <div class="secret-label phantom-label">Весь кошелёк</div>
+    </div>
+    <img class="shot phantom-shot" src="/img/chrome-phantom.png"
+         alt="Chrome with Phantom popup open" />
+  </div>
+</section>
+
+<!-- ─── §3-4: All-secrets-on-one-screen ─── -->
+<section class="scene" id="secrets">
+  <h2>А ещё — всё, что не должно покидать твой Mac</h2>
+  <div class="combined-stage">
+    <div class="shot-wrap">
+      <img class="shot" src="/img/all-secrets.png"
+           alt="Desktop: editor with secrets + Phantom popup" />
+      <!--
+        Blur overlays positioned over the seed/privkey/api lines in
+        all-secrets.png. Coordinates in CSS (.region-seed .region-privkey
+        .region-api) are tuned to the supplied screenshot layout.
+      -->
+      <div class="region region-seed"></div>
+      <div class="region region-privkey"></div>
+      <div class="region region-api"></div>
+    </div>
+    <div class="label-column">
+      <div class="secret-label" data-target="seed">Seed-фраза</div>
+      <div class="secret-label" data-target="privkey">Приватный ключ</div>
+      <div class="secret-label" data-target="api">API-ключи</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── §5: Transition ─── -->
+<section class="scene" id="transition">
+  <p class="lead" style="font-size: clamp(20px, 2.6vw, 30px); color: var(--fg);">
+    Мы могли бы заблюрить всё что угрожает твоему финансовому состоянию
+    или портит тебе настроение…
+  </p>
+</section>
+
+<!-- ─── §6: Photo swap grid ─── -->
+<section class="scene" id="photos">
+  <div class="photo-grid">
+    <div class="swap">
+      <img class="original" src="/img/photo-1.jpg" alt="" />
+      <img class="blurred"  src="/img/photo-1-blur.jpg" alt="" />
+    </div>
+    <div class="swap">
+      <img class="original" src="/img/photo-2.jpg" alt="" />
+      <img class="blurred"  src="/img/photo-2-blur.jpg" alt="" />
+    </div>
+    <div class="swap">
+      <img class="original" src="/img/photo-3.jpg" alt="" />
+      <img class="blurred"  src="/img/photo-3-blur.jpg" alt="" />
+    </div>
+  </div>
+</section>
+
+<!-- ─── §7: Sign-off + CTA ─── -->
+<section class="cta-final">
+  <p>…но это не наш профиль.</p>
+  <p class="signoff">Наша работа — твоя безопасность.</p>
+  <a class="btn" href="https://t.me/BWDevapp" target="_blank">
+    Получить ранний доступ
+  </a>
+</section>
+
+</body>
+</html>
