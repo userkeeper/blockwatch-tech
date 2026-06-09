@@ -499,21 +499,181 @@
     .news-collage .clip { max-width: 220px; font-size: 13px; }
     nav.top .links { display: none; }
   }
+
+/* ────── Side switcher (PNG art) ────── */
+.side-switcher {
+  position: fixed; top: 14%; transform: translateY(-50%);
+  z-index: 200; display: flex; flex-direction: column;
+  gap: 14px; align-items: stretch; pointer-events: none;
+}
+.side-switcher > * { pointer-events: auto; }
+.side-tab {
+  display: block; width: 320px; cursor: pointer;
+  background: transparent; border: none; padding: 0;
+  filter: drop-shadow(0 16px 28px rgba(0,0,0,0.5));
+  transition: transform 280ms cubic-bezier(.22,1,.36,1), filter 280ms ease;
+}
+.side-tab img { display: block; width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
+.side-switcher.side-right { right: 0; align-items: flex-end; }
+.side-switcher.side-right .side-tab { transform: translateX(30%); }
+.side-switcher.side-right .side-tab:hover { transform: translateX(8%); filter: drop-shadow(0 20px 36px rgba(255,255,255,0.25)); }
+.side-switcher.side-left  { left:  0; align-items: flex-start; }
+.side-switcher.side-left  .side-tab { transform: translateX(-30%); }
+.side-switcher.side-left  .side-tab:hover { transform: translateX(-8%); filter: drop-shadow(0 20px 36px rgba(255,255,255,0.25)); }
+.lang-toggle-vert {
+  position: relative; width: 76px; display: block;
+  background: transparent; border: 0; padding: 0;
+  filter: none;
+}
+.lang-toggle-vert > img.lang-bg {
+  display: block; width: 100%; height: auto;
+  user-select: none; -webkit-user-drag: none;
+}
+.lang-toggle-vert .lang-btn {
+  position: absolute; left: 0; width: 100%; height: 50%;
+  background: transparent; border: 0; padding: 0; cursor: pointer;
+  font: 0/0 a; color: transparent; z-index: 2;
+}
+.lang-toggle-vert .lang-btn[data-lang="ru"] { top: 0; }
+.lang-toggle-vert .lang-btn[data-lang="en"] { top: 50%; }
+
+.side-switcher.side-right .lang-toggle-vert { align-self: flex-end; margin-right: 14px; }
+.side-switcher.side-left  .lang-toggle-vert { align-self: flex-start; margin-left: 14px; }
+@keyframes page-swipe-out-left  { 0% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0); } 100% { transform: translateX(-100%) scale(0.96); opacity: 0; filter: blur(4px); } }
+@keyframes page-swipe-out-right { 0% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0); } 100% { transform: translateX(100%)  scale(0.96); opacity: 0; filter: blur(4px); } }
+@keyframes page-swipe-in-left   { 0% { transform: translateX(-100%) scale(0.96); opacity: 0; filter: blur(4px); } 100% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0); } }
+@keyframes page-swipe-in-right  { 0% { transform: translateX(100%)  scale(0.96); opacity: 0; filter: blur(4px); } 100% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0); } }
+body.swiping-out-left  { animation: page-swipe-out-left  560ms cubic-bezier(.7,.0,.3,1) forwards; }
+body.swiping-out-right { animation: page-swipe-out-right 560ms cubic-bezier(.7,.0,.3,1) forwards; }
+body.swiping-in-left   { animation: page-swipe-in-left   620ms cubic-bezier(.16,1,.3,1); }
+body.swiping-in-right  { animation: page-swipe-in-right  620ms cubic-bezier(.16,1,.3,1); }
+body { overflow-x: hidden; }
+@media (max-width: 720px) { .side-tab { width: 240px; } .lang-toggle-vert { width: 64px; } }
+
+
+/* ─── §11: Early Access block + success modal ─── */
+.early-sub {
+  text-align: center; max-width: 700px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  color: var(--text-muted);
+  margin: 0 0 28px; line-height: 1.6;
+}
+.early-card {
+  width: min(540px, 92vw);
+  background: linear-gradient(180deg, rgba(28,34,48,0.7), rgba(6,9,15,0.7));
+  border: 1px solid rgba(96,165,250,0.25);
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.early-price {
+  text-align: center; margin-bottom: 18px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+}
+.early-price .num { font-size: clamp(44px, 6vw, 64px); font-weight: 700; color: var(--text); }
+.early-price .cur { font-size: clamp(20px, 2.5vw, 28px); color: var(--accent); margin-left: 8px; }
+.early-bullets {
+  list-style: none; padding: 0; margin: 0 0 22px;
+  font-family: "IBM Plex Sans", sans-serif; font-size: 15px;
+  color: var(--text); line-height: 1.5;
+}
+.early-bullets li { padding: 8px 0 8px 28px; position: relative; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.early-bullets li:last-child { border-bottom: none; }
+.early-bullets li::before {
+  content: "✓"; position: absolute; left: 4px; top: 8px;
+  color: var(--accent); font-weight: 700;
+}
+.early-email {
+  width: 100%; padding: 12px 16px;
+  border-radius: 12px; border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(10,14,26,0.7); color: var(--text);
+  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 15px;
+  margin-bottom: 12px;
+  transition: border-color 200ms;
+}
+.early-email:focus { outline: none; border-color: var(--accent); }
+.early-buy {
+  width: 100%; padding: 14px 22px;
+  border-radius: 12px; border: none;
+  font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 700; font-size: 16px;
+  letter-spacing: 0.04em; cursor: pointer;
+  background: linear-gradient(180deg, #4d9fff, #1d7af5);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(29,122,245,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: transform 140ms, filter 140ms;
+}
+.early-buy:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.early-buy:active { transform: translateY(0); }
+.early-buy:disabled { opacity: 0.5; cursor: wait; }
+.early-error {
+  margin-top: 10px; color: #ff8585; font-size: 13px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace; text-align: center;
+}
+.early-meta {
+  margin-top: 14px; text-align: center;
+  color: var(--text-muted); font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; font-family: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+.success-modal {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.7); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 200ms ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.success-card {
+  width: min(440px, 92vw);
+  background: linear-gradient(180deg, rgba(28,34,48,0.95), rgba(6,9,15,0.95));
+  border: 1px solid rgba(96,165,250,0.4);
+  border-radius: 18px;
+  padding: 32px 28px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+}
+.success-card h3 {
+  margin: 0 0 14px; color: var(--accent);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: clamp(20px, 3vw, 26px);
+}
+.success-card p { margin: 0 0 12px; color: var(--text-muted); font-size: 14px; }
+.success-code {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-weight: 700; font-size: clamp(32px, 6vw, 48px);
+  color: var(--text); letter-spacing: 0.15em;
+  padding: 16px 0; margin: 14px 0;
+  background: rgba(77,159,255,0.1);
+  border: 1px dashed rgba(96,165,250,0.4);
+  border-radius: 12px;
+}
+.success-hint { font-size: 13px; line-height: 1.5; }
+.success-hint a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.success-close {
+  margin-top: 16px; padding: 10px 22px;
+  border-radius: 999px; border: 1px solid rgba(255,255,255,0.15);
+  background: transparent; color: var(--text);
+  font-family: "IBM Plex Mono", ui-monospace, monospace; cursor: pointer;
+  transition: background 140ms;
+}
+.success-close:hover { background: rgba(255,255,255,0.08); }
+
 </style>
 </head>
 <body>
 
-<nav class="top">
-  <a class="brand" href="/">
-    <img src="./logo.png" alt="" />
-    BlockWatch
+<!-- Side switcher: half-tab "Shield Extension" peeking from the left -->
+<aside class="side-switcher side-left" aria-label="Switch to Shield Extension">
+  <a class="side-tab" href="./index.html" aria-label="Shield Extension">
+    <img src="./img/btn-extension.png" alt="Shield Extension" />
   </a>
-  <div class="links">
-    <a href="/">Shield Extension</a>
-    <a href="/shield-studio.html" class="active">Shield Studio</a>
-    <a href="https://t.me/BWDevapp" target="_blank">Telegram</a>
+  <div class="lang-toggle-vert" role="group" aria-label="Language / Язык">
+    <img class="lang-bg" src="./img/btn-lang.png" alt="" />
+    <button class="lang-btn" data-lang="ru" type="button" aria-label="RU"></button>
+    <button class="lang-btn" data-lang="en" type="button" aria-label="EN"></button>
   </div>
-</nav>
+</aside>
+
 
 <!-- §1: News cutouts — actual screenshots from news sites -->
 <section class="block" id="news">
@@ -626,6 +786,36 @@
   <p data-typewrite>…но это не наш профиль.</p>
   <p class="signoff" data-typewrite data-typewrite-after="prev">Наша работа — твоя безопасность.</p>
 </section>
+
+<!-- §11: Early Access — NowPayments preorder -->
+<section class="block early" id="early">
+  <h2 data-typewrite>Купи Shield Studio до релиза</h2>
+  <p class="early-sub">Разовая покупка. Цена фиксируется навсегда.<br/>После релиза — только по подписке.</p>
+  <div class="early-card">
+    <div class="early-price"><span class="num">$49</span> <span class="cur">USDT</span></div>
+    <ul class="early-bullets">
+      <li>Shield Studio desktop app — навсегда</li>
+      <li>3 месяца Shield Premium в подарок</li>
+      <li>ИИ проверяет каждую подпись в MetaMask / Phantom / Tonkeeper</li>
+      <li>Lifetime-цена — после релиза только подписка</li>
+    </ul>
+    <input class="early-email" type="email" placeholder="email@example.com" required />
+    <button class="early-buy" type="button">Купить — $49 USDT</button>
+    <div class="early-error" hidden></div>
+    <div class="early-meta">Powered by NowPayments · USDT TRC-20 / BEP-20 / SOL</div>
+  </div>
+</section>
+
+<!-- Success modal (hidden by default; shown after NowPayments redirect) -->
+<div class="success-modal" id="successModal" hidden>
+  <div class="success-card">
+    <h3>Оплата получена</h3>
+    <p>Ваш промокод:</p>
+    <div class="success-code" id="successCode">······</div>
+    <p class="success-hint">Открой <a href="https://t.me/BLWDev_bot/app?startapp=premium" target="_blank" rel="noopener">Mini App → Premium</a>, введи код в поле «Промокод» и получи 3 месяца Shield.</p>
+    <button class="success-close" type="button">Закрыть</button>
+  </div>
+</div>
 
 
 <script>
@@ -777,6 +967,125 @@ function activateTypewritersIn(section) {
     recalcCurrent();
     activateTypewritersIn(sections[current]);
   }, 250);
+})();
+</script>
+
+<script>
+(function () {
+  document.querySelectorAll(".side-tab").forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      var href = el.getAttribute("href");
+      var outDir = el.closest(".side-right") ? "left" : "right";
+      var inDir  = outDir === "left" ? "right" : "left";
+      try { sessionStorage.setItem("bw_swipe_in", inDir); } catch (e) {}
+      document.body.classList.add("swiping-out-" + outDir);
+      setTimeout(function () { window.location.href = href; }, 520);
+    });
+  });
+  try {
+    var inDir = sessionStorage.getItem("bw_swipe_in");
+    if (inDir) {
+      sessionStorage.removeItem("bw_swipe_in");
+      document.body.classList.add("swiping-in-" + inDir);
+      setTimeout(function () { document.body.classList.remove("swiping-in-" + inDir); }, 450);
+    }
+  } catch (e) {}
+  var sideLangBtns = document.querySelectorAll(".side-switcher .lang-toggle-vert .lang-btn");
+  function paint(active) {
+    sideLangBtns.forEach(function (b) { b.classList.toggle("on", b.dataset.lang === active); });
+  }
+  var saved = "ru";
+  try { saved = localStorage.getItem("bw_lang") || "ru"; } catch (e) {}
+  paint(saved);
+  sideLangBtns.forEach(function (b) {
+    b.addEventListener("click", function () {
+      var lang = b.dataset.lang;
+      try { localStorage.setItem("bw_lang", lang); } catch (e) {}
+      paint(lang);
+      if (typeof window.setLang === "function") window.setLang(lang);
+    });
+  });
+})();
+</script>
+
+
+<script>
+/* ─── §11 Early Access purchase flow ─── */
+(function () {
+  var API_BASE = "https://amused-generosity-production-1090.up.railway.app";
+  var section = document.getElementById("early");
+  if (!section) return;
+  var emailEl = section.querySelector(".early-email");
+  var btn = section.querySelector(".early-buy");
+  var errEl = section.querySelector(".early-error");
+  function showErr(msg) {
+    errEl.textContent = msg;
+    errEl.hidden = false;
+  }
+  btn.addEventListener("click", async function () {
+    var email = (emailEl.value || "").trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showErr("Введи валидный email");
+      return;
+    }
+    errEl.hidden = true;
+    btn.disabled = true;
+    btn.textContent = "Создаю инвойс…";
+    try {
+      var r = await fetch(API_BASE + "/api/studio/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email }),
+      });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      var data = await r.json();
+      if (data.payment_url) {
+        window.location.href = data.payment_url;
+      } else {
+        showErr("Не удалось получить ссылку оплаты");
+        btn.disabled = false;
+        btn.textContent = "Купить — $49 USDT";
+      }
+    } catch (e) {
+      showErr("Ошибка: " + (e.message || e));
+      btn.disabled = false;
+      btn.textContent = "Купить — $49 USDT";
+    }
+  });
+
+  /* Success modal — fires on #paid=<order_id> hash, polls lookup until code arrives */
+  var modal = document.getElementById("successModal");
+  var codeEl = document.getElementById("successCode");
+  var closeBtn = modal.querySelector(".success-close");
+  closeBtn.addEventListener("click", function () {
+    modal.hidden = true;
+    // Strip hash so reload doesn't re-trigger
+    history.replaceState(null, "", window.location.pathname);
+  });
+  async function pollCode(orderId, attempts) {
+    if (attempts <= 0) {
+      codeEl.textContent = "— загрузка —";
+      return;
+    }
+    try {
+      var r = await fetch(API_BASE + "/api/studio/lookup?order=" + encodeURIComponent(orderId));
+      var data = await r.json();
+      if (data.code) {
+        codeEl.textContent = data.code;
+        return;
+      }
+      setTimeout(function () { pollCode(orderId, attempts - 1); }, 3000);
+    } catch {
+      setTimeout(function () { pollCode(orderId, attempts - 1); }, 3000);
+    }
+  }
+  var m = (window.location.hash || "").match(/paid=([A-Za-z0-9\-]+)/);
+  if (m) {
+    modal.hidden = false;
+    codeEl.textContent = "— загрузка —";
+    pollCode(m[1], 20);
+  }
 })();
 </script>
 </body>
