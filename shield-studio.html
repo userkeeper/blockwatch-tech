@@ -673,6 +673,80 @@ body { overflow-x: hidden; }
 }
 .success-close:hover { background: rgba(255,255,255,0.08); }
 
+
+/* ─── §11 Early Access — image-based card (PNG provides all visuals) ─── */
+.early-card-img-wrap {
+  position: relative;
+  width: min(513px, 92vw);
+  margin: 0 auto;
+  filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.55));
+}
+.early-card-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* Email input — invisible overlay positioned over the input drawn in the PNG.
+   y ~64..74% (input pill in card), x ~7..93% with small inset. */
+.early-card-img-wrap .early-email {
+  position: absolute;
+  /* New PNG (522x478) — pill sits around y 65..78%. Centre the input
+     inside that band and let line-height keep the text vertically aligned. */
+  top: 65%;
+  left: 8.5%;
+  width: 83%;
+  height: 12%;
+  padding: 0 22px;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  color: #ffffff;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: clamp(14px, 1.6vw, 18px);
+  letter-spacing: 0.02em;
+  line-height: 1;            /* native vertical centering for single-line input */
+  text-align: left;
+  outline: none;
+  caret-color: var(--accent);
+}
+.early-card-img-wrap .early-email::placeholder { color: rgba(255,255,255,0.35); }
+
+/* Buy button — invisible clickable overlay over the painted button.
+   y ~75..87%, x ~10..90% */
+.early-card-img-wrap .early-buy {
+  position: absolute;
+  top: 80%;
+  left: 11%;
+  width: 78%;
+  height: 9%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: filter 140ms, transform 140ms;
+}
+.early-card-img-wrap .early-buy:hover { filter: brightness(1.12); }
+.early-card-img-wrap .early-buy:active { transform: scale(0.985); }
+.early-card-img-wrap .early-buy:disabled { cursor: wait; opacity: 0.6; }
+.early-card-img-wrap .early-buy:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+/* Error line appears under the card, not on top */
+.early-card-img-wrap .early-error {
+  position: absolute;
+  left: 0; right: 0; bottom: -32px;
+  text-align: center;
+  color: #ff8585; font-size: 13px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+}
+.early-card-img-wrap .early-error[hidden] { display: none !important; }
+
 </style>
 </head>
 <body>
@@ -808,18 +882,11 @@ body { overflow-x: hidden; }
 <section class="block early" id="early">
   <h2 data-typewrite>Купи Shield Studio до релиза</h2>
   <p class="early-sub">Разовая покупка. Цена фиксируется навсегда.<br/>После релиза — только по подписке.</p>
-  <div class="early-card">
-    <div class="early-price"><span class="num">$49</span> <span class="cur">USDT</span></div>
-    <ul class="early-bullets">
-      <li>Shield Studio desktop app — навсегда</li>
-      <li>3 месяца Shield Premium в подарок</li>
-      <li>ИИ проверяет каждую подпись в MetaMask / Phantom / Tonkeeper</li>
-      <li>Lifetime-цена — после релиза только подписка</li>
-    </ul>
-    <input class="early-email" type="email" placeholder="email@example.com" required />
-    <button class="early-buy" type="button">Купить — $49 USDT</button>
+  <div class="early-card-img-wrap">
+    <img class="early-card-img" src="./img/pay-card-ru.png" alt="Pre-order Shield Studio — $49 USDT" />
+    <input class="early-email" type="email" placeholder="" required aria-label="Your email" />
+    <button class="early-buy" type="button" aria-label="Buy — $49 USDT"></button>
     <div class="early-error" hidden></div>
-    <div class="early-meta">Powered by NowPayments · USDT TRC-20 / BEP-20 / SOL</div>
   </div>
 </section>
 
