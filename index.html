@@ -38,7 +38,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
 /* ===================================================================
    tokens.css — Block Watch design tokens (embedded verbatim)
@@ -94,7 +94,7 @@ html, body {
   background-attachment: fixed;
   color: var(--text);
   font-family:
-    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", sans-serif;
   font-size: 16px;
   line-height: 1.5;
@@ -525,7 +525,37 @@ footer {
 .donate-orb.copied .donate-toast { opacity: 1; transform: translate(-50%, 0); }
 
 /* ---------------- Language toggle ---------------- */
-.topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+/* ---------------- Page toggle (Shield Extension | Shield Studio | Telegram) ---------------- */
+.page-toggle {
+  display: inline-flex; gap: 2px;
+  border-radius: 999px; padding: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: linear-gradient(180deg, rgba(28,34,48,0.55), rgba(6,9,15,0.55));
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.14),
+    inset 0 -4px 9px rgba(0,0,0,0.6),
+    0 6px 18px rgba(0,0,0,0.45);
+}
+.page-tab {
+  position: relative; color: var(--text-dim); text-decoration: none;
+  font: inherit; font-weight: 600; font-size: 13px; letter-spacing: 0.03em;
+  padding: 6px 14px; border-radius: 999px; white-space: nowrap;
+  transition: color 140ms ease, background 140ms ease;
+}
+.page-tab:hover { color: var(--text); }
+.page-tab.on {
+  color: var(--text);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.03) 45%, rgba(255,255,255,0) 70%),
+    radial-gradient(120% 100% at 50% 0%, rgba(96,165,250,0.45), rgba(29,122,245,0.35) 60%, rgba(29,122,245,0.0) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    inset 0 -2px 0 rgba(0,0,0,0.35),
+    0 4px 12px rgba(29,122,245,0.35);
+}
+@media (max-width: 720px) { .page-tab { padding: 5px 10px; font-size: 12px; } }
+.topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .lang-toggle {
   display: inline-flex; gap: 4px; flex: none; position: relative;
   border-radius: 999px; padding: 4px;
@@ -624,28 +654,127 @@ footer {
   }
   body footer .foot-col li { list-style: none !important; }
 }
+
+/* ===================================================================
+   Slide-deck blocks + typewriter
+   =================================================================== */
+section.block {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+section.block > .wrap { width: 100%; }
+section.block.block-low {
+  min-height: calc(100vh - 280px);
+  justify-content: center;
+  padding-top: 40px;
+  padding-bottom: 20px;
+}
+
+/* Sticky topbar so the toggle is always reachable */
+.topbar { position: sticky; top: 0; z-index: 50;
+  background: rgba(10, 14, 26, 0.78);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+
+/* Headings use IBM Plex Mono — dev-style headlines */
+h1, h2, .eyebrow {
+  font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+/* ─── Typewriter ─── */
+[data-typewrite] {
+  position: relative;
+  display: inline-block;
+  min-height: 1.2em;
+}
+[data-typewrite]:not(.tw-ready) { visibility: hidden; }
+[data-typewrite].typing::after {
+  content: "▌";
+  display: inline-block;
+  color: var(--accent);
+  animation: caret-blink 0.8s steps(2, end) infinite;
+  margin-left: 2px;
+}
+@keyframes caret-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* ────── Side switcher (PNG art) ────── */
+.side-switcher {
+  position: fixed; top: 14%; transform: translateY(-50%);
+  z-index: 200; display: flex; flex-direction: column;
+  gap: 14px; align-items: stretch; pointer-events: none;
+}
+.side-switcher > * { pointer-events: auto; }
+.side-tab {
+  display: block; width: 320px; cursor: pointer;
+  background: transparent; border: none; padding: 0;
+  filter: drop-shadow(0 16px 28px rgba(0,0,0,0.5));
+  transition: transform 280ms cubic-bezier(.22,1,.36,1), filter 280ms ease;
+}
+.side-tab img { display: block; width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
+.side-switcher.side-right { right: 0; align-items: flex-end; }
+.side-switcher.side-right .side-tab { transform: translateX(30%); }
+.side-switcher.side-right .side-tab:hover { transform: translateX(8%); filter: drop-shadow(0 20px 36px rgba(255,255,255,0.25)); }
+.side-switcher.side-left  { left:  0; align-items: flex-start; }
+.side-switcher.side-left  .side-tab { transform: translateX(-30%); }
+.side-switcher.side-left  .side-tab:hover { transform: translateX(-8%); filter: drop-shadow(0 20px 36px rgba(255,255,255,0.25)); }
+.lang-toggle-vert {
+  position: relative; width: 76px; display: block;
+  background: transparent; border: 0; padding: 0;
+  filter: none;
+}
+.lang-toggle-vert > img.lang-bg {
+  display: block; width: 100%; height: auto;
+  user-select: none; -webkit-user-drag: none;
+}
+.lang-toggle-vert .lang-btn {
+  position: absolute; left: 0; width: 100%; height: 50%;
+  background: transparent; border: 0; padding: 0; cursor: pointer;
+  font: 0/0 a; color: transparent; z-index: 2;
+}
+.lang-toggle-vert .lang-btn[data-lang="ru"] { top: 0; }
+.lang-toggle-vert .lang-btn[data-lang="en"] { top: 50%; }
+
+.side-switcher.side-right .lang-toggle-vert { align-self: flex-end; margin-right: 14px; }
+.side-switcher.side-left  .lang-toggle-vert { align-self: flex-start; margin-left: 14px; }
+@keyframes page-swipe-out-left  { 0% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0); } 100% { transform: translateX(-100%) scale(0.96); opacity: 0; filter: blur(4px); } }
+@keyframes page-swipe-out-right { 0% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0); } 100% { transform: translateX(100%)  scale(0.96); opacity: 0; filter: blur(4px); } }
+@keyframes page-swipe-in-left   { 0% { transform: translateX(-100%) scale(0.96); opacity: 0; filter: blur(4px); } 100% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0); } }
+@keyframes page-swipe-in-right  { 0% { transform: translateX(100%)  scale(0.96); opacity: 0; filter: blur(4px); } 100% { transform: translateX(0) scale(1); opacity: 1; filter: blur(0); } }
+body.swiping-out-left  { animation: page-swipe-out-left  560ms cubic-bezier(.7,.0,.3,1) forwards; }
+body.swiping-out-right { animation: page-swipe-out-right 560ms cubic-bezier(.7,.0,.3,1) forwards; }
+body.swiping-in-left   { animation: page-swipe-in-left   620ms cubic-bezier(.16,1,.3,1); }
+body.swiping-in-right  { animation: page-swipe-in-right  620ms cubic-bezier(.16,1,.3,1); }
+body { overflow-x: hidden; }
+@media (max-width: 720px) { .side-tab { width: 240px; } .lang-toggle-vert { width: 64px; } }
+
+.topbar-tg { color: var(--text-muted); font: inherit; font-weight: 600; font-size: 13px; letter-spacing: 0.03em; text-decoration: none; padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.08); transition: color 140ms, background 140ms; }
+.topbar-tg:hover { color: var(--text); background: rgba(255,255,255,0.06); }
 </style>
 </head>
 <body>
 
 <!-- ============ TOP BAR ============ -->
-<header class="topbar" data-screen-label="topbar">
-  <div class="wrap">
-    <a class="brand" href="#top" aria-label="Block Watch — на главную">
-      <img src="./logo.png" alt="Эмблема Block Watch" />
-      <span>Block Watch <span class="sub">Shield</span></span>
-    </a>
-    <div class="lang-toggle" role="group" aria-label="Language / Язык">
-      <button class="lang-btn" data-lang="ru" type="button">RU</button>
-      <button class="lang-btn" data-lang="en" type="button">EN</button>
-    </div>
+<!-- Side switcher: half-tab "Shield Studio" peeking from the right -->
+<aside class="side-switcher side-right" aria-label="Switch to Shield Studio">
+  <a class="side-tab" href="./shield-studio.html" aria-label="Shield Studio">
+    <img src="./img/btn-studio.png" alt="Shield Studio" />
+  </a>
+  <div class="lang-toggle-vert" role="group" aria-label="Language / Язык">
+    <img class="lang-bg" src="./img/btn-lang.png" alt="" />
+    <button class="lang-btn" data-lang="ru" type="button" aria-label="RU"></button>
+    <button class="lang-btn" data-lang="en" type="button" aria-label="EN"></button>
   </div>
-</header>
+</aside>
 
 <main id="top">
 
   <!-- ============ 1. HERO ============ -->
-  <section class="hero" data-screen-label="hero">
+  <section class="hero block" data-screen-label="hero">
     <div class="wrap">
       <img class="hero-emblem" src="./nav-shield.png" alt="Эмблема Block Watch Shield" />
       <h1 class="heading-gradient" data-i18n="hero_h1">Читайте каждую транзакцию до того, как кошелёк её подпишет.</h1>
@@ -656,7 +785,7 @@ footer {
   </section>
 
   <!-- ============ 2. THE PROBLEM ============ -->
-  <section class="problem" data-screen-label="problem">
+  <section class="problem block" data-screen-label="problem">
     <div class="wrap">
       <div class="problem-copy reveal">
         <p class="eyebrow" data-i18n="prob_eyebrow">Риск</p>
@@ -713,7 +842,7 @@ footer {
   </section>
 
   <!-- ============ 3. HOW IT WORKS ============ -->
-  <section class="section-pad" data-screen-label="how-it-works">
+  <section class="section-pad block" data-screen-label="how-it-works">
     <div class="wrap">
       <div class="reveal">
         <p class="eyebrow" data-i18n="how_eyebrow">Как это работает</p>
@@ -728,7 +857,7 @@ footer {
   </section>
 
   <!-- ============ 4. WHAT SHIELD CHECKS ============ -->
-  <section class="section-pad" data-screen-label="what-shield-checks">
+  <section class="section-pad block" data-screen-label="what-shield-checks">
     <div class="wrap">
       <div class="reveal">
         <p class="eyebrow" data-i18n="chk_eyebrow">Под капотом</p>
@@ -746,7 +875,7 @@ footer {
   </section>
 
   <!-- ============ 5. COMPATIBLE WALLETS ============ -->
-  <section class="wallets" data-screen-label="compatible-wallets">
+  <section class="wallets block" data-screen-label="compatible-wallets">
     <div class="wrap reveal">
       <p class="eyebrow" data-i18n="wal_eyebrow">Совместимость</p>
       <h2 class="heading-gradient" data-i18n="wal_h2">Работает с кошельками, которыми вы уже пользуетесь.</h2>
@@ -756,9 +885,12 @@ footer {
   </section>
 
   <!-- ============ 6. PREMIUM ============ -->
-  <section class="section-pad" data-screen-label="premium">
-    <div class="wrap">
-      <div class="pay-row pay-row-compact reveal">
+  <!-- ============ SUPPORT / PREMIUM + DONATE — merged ============ -->
+  <section class="support section-pad block block-low" data-screen-label="support">
+    <div class="wrap reveal">
+      <h2 class="heading-gradient" data-i18n="sup_h2">Поддержать проект</h2>
+      <p class="lead support-sub" data-i18n="sup_sub">Нажмите — адрес скопируется.</p>
+      <div class="pay-row pay-row-compact" style="margin-bottom: 28px;">
         <a href="https://t.me/BLWDev_bot/app?startapp=premium" target="_blank" rel="noopener" aria-label="Оплатить Premium через Telegram Stars">
           <img src="./pay-stars.png" alt="Оплата через Telegram Stars" />
         </a>
@@ -766,15 +898,6 @@ footer {
           <img src="./pay-ton.png" alt="Оплата через TON" />
         </a>
       </div>
-    </div>
-  </section>
-
-  <!-- ============ SUPPORT / DONATE ============ -->
-  <section class="support section-pad" data-screen-label="support">
-    <div class="wrap reveal">
-      <p class="eyebrow" data-i18n="sup_eyebrow">Донат</p>
-      <h2 class="heading-gradient" data-i18n="sup_h2">Поддержать проект</h2>
-      <p class="lead support-sub" data-i18n="sup_sub">Нажмите — адрес скопируется.</p>
       <div class="donate-grid">
         <button class="donate-orb" type="button" data-address="bc1qly65zeqwuu9jppevgn50pev4588h8kpf2ltx6d" title="bc1qly65zeqwuu9jppevgn50pev4588h8kpf2ltx6d" aria-label="Bitcoin — скопировать адрес">
           <img src="./donate-btc.png" alt="Bitcoin" />
@@ -973,7 +1096,17 @@ footer {
     document.documentElement.lang = lang;
     nodes.forEach(function (el) {
       var k = el.getAttribute('data-i18n');
-      if (I18N[k] && I18N[k][lang] != null) el.innerHTML = I18N[k][lang];
+      if (!(I18N[k] && I18N[k][lang] != null)) return;
+      var text = I18N[k][lang];
+      if (el.hasAttribute('data-typewrite')) {
+        // Keep the typewriter machinery in sync with the chosen
+        // language. New text → store for typing; if already typed,
+        // swap in place.
+        el.dataset.text = text;
+        if (el.dataset.typed === "1") el.innerHTML = text;
+      } else {
+        el.innerHTML = text;
+      }
     });
     imgNodes.forEach(function (el) {
       var k = el.getAttribute('data-i18n-img');
@@ -1018,5 +1151,135 @@ footer {
   });
 })();
 </script>
+
+<script>
+(function () {
+  /* ─── Pre-clean every [data-typewrite] so it doesn't flash full text ─── */
+  function preClean() {
+    document.querySelectorAll("[data-typewrite]").forEach(function (el) {
+      if (el.dataset.text == null) el.dataset.text = el.innerHTML;
+      el.innerHTML = "";
+      el.classList.add("tw-ready");
+    });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", preClean);
+  } else {
+    preClean();
+  }
+
+  /* ─── Typewriter ─── */
+  function typewriteElement(el, onDone) {
+    if (el.dataset.typed === "1") { if (typeof onDone === "function") onDone(); return; }
+    var full = el.dataset.text != null ? el.dataset.text : el.innerHTML;
+    if (el.dataset.text == null) el.dataset.text = full;
+    el.innerHTML = "";
+    el.classList.add("tw-ready");
+    el.classList.add("typing");
+    el.dataset.typed = "1";
+    var i = 0;
+    var speed = Math.max(40, Math.min(120, 3000 / full.length));
+    function step() {
+      if (i >= full.length) {
+        el.classList.remove("typing");
+        if (typeof onDone === "function") onDone();
+        return;
+      }
+      el.innerHTML += full.charAt(i);
+      i++;
+      setTimeout(step, speed);
+    }
+    step();
+  }
+  function activateTypewritersIn(section) {
+    section.querySelectorAll("[data-typewrite]").forEach(function (el) { typewriteElement(el); });
+  }
+
+  /* ─── Slide-deck nav (wheel / arrows / touch) ─── */
+  var sections = Array.prototype.slice.call(document.querySelectorAll("section.block"));
+  if (!sections.length) return;
+  var current = 0, locked = false;
+  function go(idx) {
+    if (idx < 0 || idx >= sections.length) return;
+    locked = true;
+    current = idx;
+    sections[idx].scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(function () { activateTypewritersIn(sections[idx]); locked = false; }, 800);
+  }
+  function recalc() {
+    var mid = window.scrollY + window.innerHeight / 2;
+    for (var i = 0; i < sections.length; i++) {
+      var t = sections[i].offsetTop;
+      var b = t + sections[i].offsetHeight;
+      if (mid >= t && mid < b) { current = i; return; }
+    }
+  }
+  window.addEventListener("wheel", function (e) {
+    if (locked) { e.preventDefault(); return; }
+    e.preventDefault();
+    recalc();
+    if (e.deltaY > 30) go(current + 1);
+    else if (e.deltaY < -30) go(current - 1);
+  }, { passive: false });
+  window.addEventListener("keydown", function (e) {
+    if (locked) return;
+    if (["ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); recalc(); go(current + 1); }
+    else if (["ArrowUp", "PageUp"].includes(e.key))    { e.preventDefault(); recalc(); go(current - 1); }
+    else if (e.key === "Home") { e.preventDefault(); go(0); }
+    else if (e.key === "End")  { e.preventDefault(); go(sections.length - 1); }
+  });
+  var touchY = 0;
+  window.addEventListener("touchstart", function (e) { touchY = e.touches[0].clientY; }, { passive: true });
+  window.addEventListener("touchend", function (e) {
+    if (locked) return;
+    var dy = touchY - (e.changedTouches[0] ? e.changedTouches[0].clientY : touchY);
+    recalc();
+    if (dy > 50) go(current + 1);
+    else if (dy < -50) go(current - 1);
+  }, { passive: true });
+  // Fire typewriter on first visible section
+  setTimeout(function () { recalc(); activateTypewritersIn(sections[current]); }, 350);
+})();
+</script>
+
+<script>
+(function () {
+  document.querySelectorAll(".side-tab").forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      var href = el.getAttribute("href");
+      var outDir = el.closest(".side-right") ? "left" : "right";
+      var inDir  = outDir === "left" ? "right" : "left";
+      try { sessionStorage.setItem("bw_swipe_in", inDir); } catch (e) {}
+      document.body.classList.add("swiping-out-" + outDir);
+      setTimeout(function () { window.location.href = href; }, 520);
+    });
+  });
+  try {
+    var inDir = sessionStorage.getItem("bw_swipe_in");
+    if (inDir) {
+      sessionStorage.removeItem("bw_swipe_in");
+      document.body.classList.add("swiping-in-" + inDir);
+      setTimeout(function () { document.body.classList.remove("swiping-in-" + inDir); }, 450);
+    }
+  } catch (e) {}
+  var sideLangBtns = document.querySelectorAll(".side-switcher .lang-toggle-vert .lang-btn");
+  function paint(active) {
+    sideLangBtns.forEach(function (b) { b.classList.toggle("on", b.dataset.lang === active); });
+  }
+  var saved = "ru";
+  try { saved = localStorage.getItem("bw_lang") || "ru"; } catch (e) {}
+  paint(saved);
+  sideLangBtns.forEach(function (b) {
+    b.addEventListener("click", function () {
+      var lang = b.dataset.lang;
+      try { localStorage.setItem("bw_lang", lang); } catch (e) {}
+      paint(lang);
+      if (typeof window.setLang === "function") window.setLang(lang);
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
